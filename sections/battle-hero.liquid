@@ -12,6 +12,8 @@
   data-end-date="{{ section.settings.end_date | escape }}"
   data-locale="{{ request.locale.iso_code | default: 'en-GB' }}"
   data-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+  data-sweet-name="{{ section.settings.sweet_label | escape }}"
+  data-savoury-name="{{ section.settings.savoury_label | escape }}"
 >
   <div class="battle-hero__stage">
     <div class="battle-hero__side battle-hero__side--sweet">
@@ -35,6 +37,17 @@
         <p class="battle-hero__tagline" data-battle-countdown>{{ section.settings.subheading }}</p>
         <p class="battle-hero__leader" data-battle-headline>Awaiting the first strike...</p>
 
+        <div class="battle-hero__status-row">
+          <div class="battle-hero__status battle-hero__status--sweet">
+            <span class="battle-hero__status-label">{{ section.settings.sweet_label }}</span>
+            <span class="battle-hero__status-text" data-battle-sweet-status>Sweet takes the lead</span>
+          </div>
+          <div class="battle-hero__status battle-hero__status--savoury">
+            <span class="battle-hero__status-label">{{ section.settings.savoury_label }}</span>
+            <span class="battle-hero__status-text" data-battle-savoury-status>Savoury fighting back</span>
+          </div>
+        </div>
+
         <div class="battle-hero__scoreboard">
           <div class="battle-hero__percent battle-hero__percent--sweet">
             <div class="battle-hero__percent-value" data-battle-sweet-percent>50%</div>
@@ -42,9 +55,12 @@
             <div class="battle-hero__team-revenue" data-battle-sweet-revenue>0</div>
           </div>
 
-          <div class="battle-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
-            <span class="battle-hero__bar-fill" data-battle-bar></span>
-            <span class="battle-hero__bar-label">Live score bar</span>
+          <div class="battle-hero__bar-frame">
+            <div class="battle-hero__bar-header">Live battle progress</div>
+            <div class="battle-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+              <span class="battle-hero__bar-fill" data-battle-bar></span>
+              <span class="battle-hero__bar-vs">vs</span>
+            </div>
           </div>
 
           <div class="battle-hero__percent battle-hero__percent--savoury">
@@ -73,9 +89,12 @@
   #shopify-section-{{ section.id }} .battle-hero {
     --battle-gap: clamp(16px, 2vw, 28px);
     --battle-border: rgb(var(--color-border-rgb) / 0.2);
-    --battle-sweet: rgb(var(--color-foreground-rgb) / 0.1);
-    --battle-savoury: rgb(var(--color-foreground-rgb) / 0.2);
-    --battle-bar: rgb(var(--color-foreground-rgb));
+    --battle-sweet: #f7dfe4;
+    --battle-savoury: #f7ead8;
+    --battle-sweet-bar: #d98c9b;
+    --battle-savoury-bar: #d3a56f;
+    --battle-bar-border: #c7b39d;
+    --battle-panel: #f8efe3;
 
     position: relative;
     overflow: hidden;
@@ -162,6 +181,32 @@
     font-weight: 700;
   }
 
+  #shopify-section-{{ section.id }} .battle-hero__status-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.8rem;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__status {
+    display: grid;
+    gap: 6px;
+    padding: 10px 14px;
+    border: 1px solid var(--battle-border);
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__status--savoury {
+    text-align: right;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__status-text {
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
   #shopify-section-{{ section.id }} .battle-hero__scoreboard {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(120px, 2fr) minmax(0, 1fr);
@@ -182,31 +227,49 @@
     font-weight: 700;
   }
 
+  #shopify-section-{{ section.id }} .battle-hero__bar-frame {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px solid var(--battle-bar-border);
+    background: var(--battle-panel);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar-header {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
   #shopify-section-{{ section.id }} .battle-hero__bar {
     position: relative;
-    height: 18px;
-    border-radius: 999px;
-    background: rgb(var(--color-foreground-rgb) / 0.12);
+    height: 40px;
+    border-radius: 8px;
+    background: var(--battle-savoury-bar);
+    border: 2px solid var(--battle-bar-border);
     overflow: hidden;
+    box-shadow: 0 10px 30px rgb(var(--color-foreground-rgb) / 0.08);
   }
 
   #shopify-section-{{ section.id }} .battle-hero__bar-fill {
     position: absolute;
     inset: 0 auto 0 0;
     width: 50%;
-    background: linear-gradient(90deg, var(--battle-bar), rgb(var(--color-foreground-rgb) / 0.6));
+    background: var(--battle-sweet-bar);
     transition: width 900ms var(--ease-out-cubic, ease);
   }
 
-  #shopify-section-{{ section.id }} .battle-hero__bar-label {
+  #shopify-section-{{ section.id }} .battle-hero__bar-vs {
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
+    font-size: 1rem;
+    font-weight: 700;
     text-transform: uppercase;
-    color: rgb(var(--color-background-rgb));
+    color: rgb(var(--color-foreground-rgb));
+    mix-blend-mode: multiply;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__cta-row {
@@ -231,6 +294,10 @@
     font-size: clamp(1.6rem, 4vw, 3rem);
     font-weight: 700;
     z-index: var(--layer-overlay);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__lock[hidden] {
+    display: none;
   }
 
   #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__stage {
@@ -276,8 +343,8 @@
       grid-template-columns: 1fr;
     }
 
-    #shopify-section-{{ section.id }} .battle-hero__bar-label {
-      color: var(--color-foreground);
+    #shopify-section-{{ section.id }} .battle-hero__status-row {
+      grid-template-columns: 1fr;
     }
   }
 

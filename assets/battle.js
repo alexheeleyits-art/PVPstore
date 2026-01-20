@@ -132,6 +132,10 @@
       this.locale = section.dataset.locale || navigator.language || 'en-GB';
       this.currency = section.dataset.currency || 'GBP';
       this.endDate = section.dataset.endDate ? new Date(section.dataset.endDate) : null;
+      this.sweetName = section.dataset.sweetName || 'Sweet';
+      this.savouryName = section.dataset.savouryName || 'Savoury';
+      this.sweetShort = this.sweetName.replace(/^Team\\s+/i, '').trim() || 'Sweet';
+      this.savouryShort = this.savouryName.replace(/^Team\\s+/i, '').trim() || 'Savoury';
 
       this.elements = {
         bar: section.querySelector('[data-battle-bar]'),
@@ -143,6 +147,8 @@
         countdown: section.querySelector('[data-battle-countdown]'),
         lock: section.querySelector('[data-battle-lock]'),
         winner: section.querySelector('[data-battle-winner]'),
+        sweetStatus: section.querySelector('[data-battle-sweet-status]'),
+        savouryStatus: section.querySelector('[data-battle-savoury-status]'),
       };
 
       this.state = {
@@ -258,9 +264,26 @@
         }
       }
 
+      if (this.elements.sweetStatus && this.elements.savouryStatus) {
+        if (leader === 'Sweet') {
+          this.elements.sweetStatus.textContent = `${this.sweetShort} takes the lead`;
+          this.elements.savouryStatus.textContent = `${this.savouryShort} fighting back`;
+        } else if (leader === 'Savoury') {
+          this.elements.sweetStatus.textContent = `${this.sweetShort} fighting back`;
+          this.elements.savouryStatus.textContent = `${this.savouryShort} takes the lead`;
+        } else {
+          this.elements.sweetStatus.textContent = 'Neck and neck';
+          this.elements.savouryStatus.textContent = 'Neck and neck';
+        }
+      }
+
       this.section.classList.remove('is-leading-sweet', 'is-leading-savoury');
       if (leader === 'Sweet') this.section.classList.add('is-leading-sweet');
       if (leader === 'Savoury') this.section.classList.add('is-leading-savoury');
+
+      if (this.elements.lock) {
+        this.elements.lock.hidden = !this.isLocked;
+      }
 
       if (this.isLocked) {
         this.updateWinner();
