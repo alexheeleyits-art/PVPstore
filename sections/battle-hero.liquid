@@ -1,0 +1,771 @@
+{% liquid
+  assign sweet_collection = section.settings.sweet_collection
+  assign savoury_collection = section.settings.savoury_collection
+  assign max_products = section.settings.max_products
+  assign sweet_url = sweet_collection.url | default: '#'
+  assign savoury_url = savoury_collection.url | default: '#'
+%}
+
+<section
+  class="battle-hero color-{{ section.settings.color_scheme }}"
+  data-battle-hero
+  data-endpoint="{{ section.settings.endpoint | escape }}"
+  data-poll-min="{{ section.settings.poll_min | times: 1000 }}"
+  data-poll-max="{{ section.settings.poll_max | times: 1000 }}"
+  data-end-date="{{ section.settings.end_date | escape }}"
+  data-locale="{{ request.locale.iso_code | default: 'en-GB' }}"
+  data-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+>
+  <div class="battle-hero__ticker" role="status" aria-live="polite">
+    <div class="battle-hero__ticker-inner">
+      <span class="battle-hero__ticker-label">Live battle</span>
+      <span class="battle-hero__ticker-message" data-battle-ticker>Loading live scores...</span>
+    </div>
+  </div>
+
+  <div class="battle-hero__stage">
+    <div class="battle-hero__side battle-hero__side--sweet">
+      <div class="battle-hero__side-inner">
+        <p class="battle-hero__side-label">{{ section.settings.sweet_label }}</p>
+        <p class="battle-hero__side-revenue" data-battle-sweet-revenue>0</p>
+        <a class="button button-secondary battle-hero__shop" href="{{ sweet_url }}">{{ section.settings.sweet_button_label }}</a>
+      </div>
+    </div>
+
+    <div class="battle-hero__side battle-hero__side--savoury">
+      <div class="battle-hero__side-inner">
+        <p class="battle-hero__side-label">{{ section.settings.savoury_label }}</p>
+        <p class="battle-hero__side-revenue" data-battle-savoury-revenue>0</p>
+        <a class="button button-secondary battle-hero__shop" href="{{ savoury_url }}">{{ section.settings.savoury_button_label }}</a>
+      </div>
+    </div>
+
+    <div class="battle-hero__overlay" aria-live="polite">
+      <div class="battle-hero__overlay-inner">
+        <p class="battle-hero__eyebrow">{{ section.settings.eyebrow }}</p>
+        <h2 class="battle-hero__title">{{ section.settings.heading }}</h2>
+        <p class="battle-hero__tagline" data-battle-countdown>{{ section.settings.subheading }}</p>
+        <p class="battle-hero__leader" data-battle-headline>Awaiting the first strike...</p>
+
+        <div class="battle-hero__scoreboard">
+          <div class="battle-hero__percent battle-hero__percent--sweet">
+            <div class="battle-hero__percent-value" data-battle-sweet-percent>50%</div>
+            <div class="battle-hero__team">{{ section.settings.sweet_label }}</div>
+            <div class="battle-hero__team-revenue" data-battle-sweet-revenue>0</div>
+          </div>
+
+          <div class="battle-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+            <span class="battle-hero__bar-fill" data-battle-bar></span>
+            <span class="battle-hero__bar-label">Live score bar</span>
+          </div>
+
+          <div class="battle-hero__percent battle-hero__percent--savoury">
+            <div class="battle-hero__percent-value" data-battle-savoury-percent>50%</div>
+            <div class="battle-hero__team">{{ section.settings.savoury_label }}</div>
+            <div class="battle-hero__team-revenue" data-battle-savoury-revenue>0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="battle-hero__lock" data-battle-lock hidden>
+      <div class="battle-hero__lock-inner">
+        Battle Over - Winner: <span data-battle-winner>Pending</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="battle-hero__products">
+    <div class="battle-hero__products-header">
+      <h3 class="battle-hero__products-title">{{ section.settings.products_heading }}</h3>
+    </div>
+
+    <div class="battle-hero__products-grid">
+      <div class="battle-hero__products-column">
+        <div class="battle-hero__products-column-header">
+          <h4>{{ section.settings.sweet_products_heading }}</h4>
+          <a class="battle-hero__link" href="{{ sweet_url }}">{{ section.settings.sweet_link_label }}</a>
+        </div>
+        <div class="battle-hero__product-grid">
+          {% if sweet_collection != blank and shop.products_count != 0 %}
+            {% for product in sweet_collection.products limit: max_products %}
+              <div class="battle-hero__product-card">
+                {% # theme-check-disable UniqueStaticBlockId %}
+                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: product %}
+                {% # theme-check-enable UniqueStaticBlockId %}
+                {% if product != blank %}
+                  {% liquid
+                    assign variant = product.selected_or_first_available_variant
+                    assign can_add_to_cart = false
+                    assign add_to_cart_text = 'products.product.add_to_cart' | t
+
+                    if variant == blank
+                      assign can_add_to_cart = false
+                      assign add_to_cart_text = 'products.product.unavailable' | t
+                    elsif variant.available
+                      assign can_add_to_cart = true
+                      assign add_to_cart_text = 'products.product.add_to_cart' | t
+                    else
+                      assign can_add_to_cart = false
+                      assign add_to_cart_text = 'products.product.sold_out' | t
+                    endif
+
+                    assign product_form_id = 'BattleHero-ProductForm-' | append: section.id | append: '-' | append: product.id
+                    assign add_button_id = 'BattleHero-AddToCart-' | append: section.id | append: '-' | append: product.id
+                  %}
+                  <product-form-component
+                    class="battle-hero__buy"
+                    data-section-id="{{ section.id }}"
+                    data-product-id="{{ product.id }}"
+                    data-product-url="{{ product.url }}"
+                    on:submit="/handleSubmit"
+                    data-quantity-default="1"
+                    data-quantity-error-max="{{ 'products.product.quantity_error_max' | t }}"
+                  >
+                    <div
+                      class="visually-hidden"
+                      aria-live="assertive"
+                      role="status"
+                      aria-atomic="true"
+                      ref="liveRegion"
+                    ></div>
+                    {%- form 'product', product, id: product_form_id, data-type: 'add-to-cart-form' -%}
+                      <input
+                        type="hidden"
+                        name="id"
+                        ref="variantId"
+                        value="{{ variant.id }}"
+                        {% unless can_add_to_cart %}disabled{% endunless %}
+                      >
+                      <input type="hidden" name="quantity" value="1">
+                      {% render 'add-to-cart-button',
+                        id: add_button_id,
+                        class: 'button button-secondary battle-hero__buy-button add-to-cart-button',
+                        can_add_to_cart: can_add_to_cart,
+                        product: product,
+                        add_to_cart_text: add_to_cart_text
+                      %}
+                    {%- endform -%}
+                  </product-form-component>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            {% for i in (1..max_products) %}
+              <div class="battle-hero__product-card">
+                {% # theme-check-disable UniqueStaticBlockId %}
+                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: null %}
+                {% # theme-check-enable UniqueStaticBlockId %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="battle-hero__products-column">
+        <div class="battle-hero__products-column-header">
+          <h4>{{ section.settings.savoury_products_heading }}</h4>
+          <a class="battle-hero__link" href="{{ savoury_url }}">{{ section.settings.savoury_link_label }}</a>
+        </div>
+        <div class="battle-hero__product-grid">
+          {% if savoury_collection != blank and shop.products_count != 0 %}
+            {% for product in savoury_collection.products limit: max_products %}
+              <div class="battle-hero__product-card">
+                {% # theme-check-disable UniqueStaticBlockId %}
+                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: product %}
+                {% # theme-check-enable UniqueStaticBlockId %}
+                {% if product != blank %}
+                  {% liquid
+                    assign variant = product.selected_or_first_available_variant
+                    assign can_add_to_cart = false
+                    assign add_to_cart_text = 'products.product.add_to_cart' | t
+
+                    if variant == blank
+                      assign can_add_to_cart = false
+                      assign add_to_cart_text = 'products.product.unavailable' | t
+                    elsif variant.available
+                      assign can_add_to_cart = true
+                      assign add_to_cart_text = 'products.product.add_to_cart' | t
+                    else
+                      assign can_add_to_cart = false
+                      assign add_to_cart_text = 'products.product.sold_out' | t
+                    endif
+
+                    assign product_form_id = 'BattleHero-ProductForm-' | append: section.id | append: '-' | append: product.id
+                    assign add_button_id = 'BattleHero-AddToCart-' | append: section.id | append: '-' | append: product.id
+                  %}
+                  <product-form-component
+                    class="battle-hero__buy"
+                    data-section-id="{{ section.id }}"
+                    data-product-id="{{ product.id }}"
+                    data-product-url="{{ product.url }}"
+                    on:submit="/handleSubmit"
+                    data-quantity-default="1"
+                    data-quantity-error-max="{{ 'products.product.quantity_error_max' | t }}"
+                  >
+                    <div
+                      class="visually-hidden"
+                      aria-live="assertive"
+                      role="status"
+                      aria-atomic="true"
+                      ref="liveRegion"
+                    ></div>
+                    {%- form 'product', product, id: product_form_id, data-type: 'add-to-cart-form' -%}
+                      <input
+                        type="hidden"
+                        name="id"
+                        ref="variantId"
+                        value="{{ variant.id }}"
+                        {% unless can_add_to_cart %}disabled{% endunless %}
+                      >
+                      <input type="hidden" name="quantity" value="1">
+                      {% render 'add-to-cart-button',
+                        id: add_button_id,
+                        class: 'button button-secondary battle-hero__buy-button add-to-cart-button',
+                        can_add_to_cart: can_add_to_cart,
+                        product: product,
+                        add_to_cart_text: add_to_cart_text
+                      %}
+                    {%- endform -%}
+                  </product-form-component>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            {% for i in (1..max_products) %}
+              <div class="battle-hero__product-card">
+                {% # theme-check-disable UniqueStaticBlockId %}
+                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: null %}
+                {% # theme-check-enable UniqueStaticBlockId %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .battle-hero {
+    --battle-gap: clamp(16px, 2vw, 28px);
+    --battle-border: rgb(var(--color-border-rgb) / 0.2);
+    --battle-sweet: rgb(var(--color-foreground-rgb) / 0.1);
+    --battle-savoury: rgb(var(--color-foreground-rgb) / 0.2);
+    --battle-bar: rgb(var(--color-foreground-rgb));
+
+    position: relative;
+    overflow: hidden;
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__ticker {
+    position: sticky;
+    top: var(--header-height, 0px);
+    z-index: var(--layer-sticky);
+    background: var(--color-background);
+    border-bottom: 1px solid var(--battle-border);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__ticker-inner {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__ticker-label {
+    font-weight: 600;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__stage {
+    min-height: 100svh;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    position: relative;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side {
+    position: relative;
+    padding: clamp(32px, 6vw, 64px) clamp(20px, 4vw, 56px);
+    display: flex;
+    align-items: flex-end;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side--sweet {
+    background: linear-gradient(135deg, var(--battle-sweet), transparent 70%);
+    border-right: 1px solid var(--battle-border);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side--savoury {
+    background: linear-gradient(225deg, var(--battle-savoury), transparent 70%);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-inner {
+    display: grid;
+    gap: 10px;
+    max-width: 280px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-label {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-revenue {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__shop {
+    width: fit-content;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__overlay {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(20px, 4vw, 48px);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__overlay-inner {
+    max-width: 720px;
+    display: grid;
+    gap: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__eyebrow {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__title {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__tagline {
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__leader {
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    font-weight: 700;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__scoreboard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(120px, 2fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__percent {
+    display: grid;
+    gap: 4px;
+    justify-items: center;
+    font-size: 0.9rem;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__percent-value {
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 700;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar {
+    position: relative;
+    height: 18px;
+    border-radius: 999px;
+    background: rgb(var(--color-foreground-rgb) / 0.12);
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 50%;
+    background: linear-gradient(90deg, var(--battle-bar), rgb(var(--color-foreground-rgb) / 0.6));
+    transition: width 900ms var(--ease-out-cubic, ease);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar-label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgb(var(--color-background-rgb));
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__lock {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgb(var(--color-background-rgb) / 0.85);
+    text-align: center;
+    font-size: clamp(1.6rem, 4vw, 3rem);
+    font-weight: 700;
+    z-index: var(--layer-overlay);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__stage,
+  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__products {
+    pointer-events: none;
+    filter: grayscale(0.2);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__products {
+    padding: clamp(32px, 6vw, 64px) clamp(16px, 4vw, 64px);
+    border-top: 1px solid var(--battle-border);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__products-title {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(20px, 4vw, 48px);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__products-column-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__link {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__product-grid {
+    display: grid;
+    gap: var(--battle-gap);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__product-card {
+    display: grid;
+    gap: 10px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__buy {
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__buy-button {
+    width: 100%;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero.is-leading-sweet .battle-hero__side--sweet::after,
+  #shopify-section-{{ section.id }} .battle-hero.is-leading-savoury .battle-hero__side--savoury::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 30%, rgb(var(--color-foreground-rgb) / 0.15), transparent 65%);
+    animation: battlePulse 2.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes battlePulse {
+    0%,
+    100% {
+      opacity: 0.2;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .battle-hero__stage {
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__side {
+      align-items: flex-start;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__side--sweet {
+      border-right: none;
+      border-bottom: 1px solid var(--battle-border);
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__scoreboard {
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__bar-label {
+      color: var(--color-foreground);
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__products-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #shopify-section-{{ section.id }} .battle-hero__bar-fill {
+      transition: none;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero.is-leading-sweet .battle-hero__side--sweet::after,
+    #shopify-section-{{ section.id }} .battle-hero.is-leading-savoury .battle-hero__side--savoury::after {
+      animation: none;
+    }
+  }
+{% endstyle %}
+
+<script src="{{ 'battle.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Battle hero",
+  "class": "battle-hero-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Sweet vs Savoury"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Battle for the win"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "60 days - Battle for the win"
+    },
+    {
+      "type": "text",
+      "id": "sweet_label",
+      "label": "Sweet label",
+      "default": "Team Sweet"
+    },
+    {
+      "type": "text",
+      "id": "savoury_label",
+      "label": "Savoury label",
+      "default": "Team Savoury"
+    },
+    {
+      "type": "text",
+      "id": "sweet_button_label",
+      "label": "Sweet button label",
+      "default": "Shop Sweet Side"
+    },
+    {
+      "type": "text",
+      "id": "savoury_button_label",
+      "label": "Savoury button label",
+      "default": "Shop Savoury Side"
+    },
+    {
+      "type": "text",
+      "id": "products_heading",
+      "label": "Products heading",
+      "default": "Featured items"
+    },
+    {
+      "type": "text",
+      "id": "sweet_products_heading",
+      "label": "Sweet products heading",
+      "default": "Top Sweet Picks"
+    },
+    {
+      "type": "text",
+      "id": "savoury_products_heading",
+      "label": "Savoury products heading",
+      "default": "Top Savoury Picks"
+    },
+    {
+      "type": "text",
+      "id": "sweet_link_label",
+      "label": "Sweet link label",
+      "default": "Shop Sweet Side"
+    },
+    {
+      "type": "text",
+      "id": "savoury_link_label",
+      "label": "Savoury link label",
+      "default": "Shop Savoury Side"
+    },
+    {
+      "type": "collection",
+      "id": "sweet_collection",
+      "label": "Sweet collection"
+    },
+    {
+      "type": "collection",
+      "id": "savoury_collection",
+      "label": "Savoury collection"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Products per side",
+      "min": 2,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "Battle end date (ISO 8601)",
+      "default": "2026-02-01T00:00:00Z"
+    },
+    {
+      "type": "text",
+      "id": "endpoint",
+      "label": "Battle state endpoint",
+      "default": "/battle-state.json"
+    },
+    {
+      "type": "range",
+      "id": "poll_min",
+      "label": "Poll minimum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "poll_max",
+      "label": "Poll maximum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 24
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "blocks": {
+    "battle-product-card": {
+      "type": "_product-card",
+      "name": "t:names.product_card",
+      "static": true,
+      "settings": {
+        "product_card_gap": 4,
+        "inherit_color_scheme": true,
+        "color_scheme": "",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "padding-block-start": 0,
+        "padding-block-end": 0,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
+      },
+      "blocks": {
+        "product-card-gallery": {
+          "type": "_product-card-gallery",
+          "name": "t:names.product_card_media",
+          "settings": {
+            "image_ratio": "adapt",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "product_title": {
+          "type": "product-title",
+          "name": "t:names.product_title",
+          "settings": {
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "rte",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "color": "var(--color-foreground)",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 4,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "price": {
+          "type": "price",
+          "name": "t:names.product_price",
+          "settings": {
+            "show_sale_price_first": true,
+            "show_installments": false,
+            "show_tax_info": false,
+            "type_preset": "h6",
+            "width": "100%",
+            "alignment": "left",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "color": "var(--color-foreground)",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        }
+      },
+      "block_order": ["product-card-gallery", "product_title", "price"]
+    }
+  },
+  "presets": [
+    {
+      "name": "Battle hero"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}
