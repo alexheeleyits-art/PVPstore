@@ -19,15 +19,31 @@
     <div class="battle-hero__side battle-hero__side--sweet">
       <div class="battle-hero__side-inner">
         <p class="battle-hero__side-label">{{ section.settings.sweet_label }}</p>
-        <p class="battle-hero__side-revenue" data-battle-sweet-revenue>0</p>
       </div>
+      {% if section.settings.sweet_image != blank %}
+        <div class="battle-hero__side-media battle-hero__side-media--sweet">
+          {{
+            section.settings.sweet_image
+            | image_url: width: 900
+            | image_tag: class: 'battle-hero__side-image', loading: 'lazy'
+          }}
+        </div>
+      {% endif %}
     </div>
 
     <div class="battle-hero__side battle-hero__side--savoury">
       <div class="battle-hero__side-inner">
         <p class="battle-hero__side-label">{{ section.settings.savoury_label }}</p>
-        <p class="battle-hero__side-revenue" data-battle-savoury-revenue>0</p>
       </div>
+      {% if section.settings.savoury_image != blank %}
+        <div class="battle-hero__side-media battle-hero__side-media--savoury">
+          {{
+            section.settings.savoury_image
+            | image_url: width: 900
+            | image_tag: class: 'battle-hero__side-image', loading: 'lazy'
+          }}
+        </div>
+      {% endif %}
     </div>
 
     <div class="battle-hero__overlay" aria-live="polite">
@@ -52,21 +68,25 @@
           <div class="battle-hero__percent battle-hero__percent--sweet">
             <div class="battle-hero__percent-value" data-battle-sweet-percent>50%</div>
             <div class="battle-hero__team">{{ section.settings.sweet_label }}</div>
-            <div class="battle-hero__team-revenue" data-battle-sweet-revenue>0</div>
           </div>
 
           <div class="battle-hero__bar-frame">
             <div class="battle-hero__bar-header">Live battle progress</div>
             <div class="battle-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
               <span class="battle-hero__bar-fill" data-battle-bar></span>
+              <span class="battle-hero__bar-metric battle-hero__bar-metric--sweet">
+                <span data-battle-sweet-percent>50%</span>
+              </span>
               <span class="battle-hero__bar-vs">vs</span>
+              <span class="battle-hero__bar-metric battle-hero__bar-metric--savoury">
+                <span data-battle-savoury-percent>50%</span>
+              </span>
             </div>
           </div>
 
           <div class="battle-hero__percent battle-hero__percent--savoury">
             <div class="battle-hero__percent-value" data-battle-savoury-percent>50%</div>
             <div class="battle-hero__team">{{ section.settings.savoury_label }}</div>
-            <div class="battle-hero__team-revenue" data-battle-savoury-revenue>0</div>
           </div>
         </div>
 
@@ -129,6 +149,27 @@
     display: grid;
     gap: 10px;
     max-width: 280px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-media {
+    position: absolute;
+    bottom: 0;
+    width: min(42%, 320px);
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-media--sweet {
+    left: clamp(12px, 3vw, 36px);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-media--savoury {
+    right: clamp(12px, 3vw, 36px);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__side-image {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__side-label {
@@ -209,7 +250,7 @@
 
   #shopify-section-{{ section.id }} .battle-hero__scoreboard {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(120px, 2fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 2.4fr) minmax(0, 1fr);
     align-items: center;
     gap: 16px;
     margin-top: 12px;
@@ -220,6 +261,7 @@
     gap: 4px;
     justify-items: center;
     font-size: 0.9rem;
+    min-width: 120px;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__percent-value {
@@ -234,6 +276,8 @@
     border-radius: 14px;
     border: 1px solid var(--battle-bar-border);
     background: var(--battle-panel);
+    justify-self: center;
+    width: min(520px, 100%);
   }
 
   #shopify-section-{{ section.id }} .battle-hero__bar-header {
@@ -244,7 +288,7 @@
 
   #shopify-section-{{ section.id }} .battle-hero__bar {
     position: relative;
-    height: 40px;
+    height: 56px;
     border-radius: 8px;
     background: var(--battle-savoury-bar);
     border: 2px solid var(--battle-bar-border);
@@ -265,11 +309,36 @@
     inset: 0;
     display: grid;
     place-items: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     text-transform: uppercase;
     color: rgb(var(--color-foreground-rgb));
     mix-blend-mode: multiply;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar-metric {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding: 0 16px;
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar-metric--sweet {
+    justify-items: start;
+    color: #ffffff;
+    text-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__bar-metric--savoury {
+    justify-items: end;
+    color: #3a2f26;
+    text-shadow: 0 4px 12px rgb(255 255 255 / 0.35);
   }
 
   #shopify-section-{{ section.id }} .battle-hero__cta-row {
@@ -346,6 +415,11 @@
     #shopify-section-{{ section.id }} .battle-hero__status-row {
       grid-template-columns: 1fr;
     }
+
+    #shopify-section-{{ section.id }} .battle-hero__side-media {
+      width: min(55%, 260px);
+      opacity: 0.9;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -408,6 +482,16 @@
       "id": "savoury_button_label",
       "label": "Savoury button label",
       "default": "Shop Savoury Side"
+    },
+    {
+      "type": "image_picker",
+      "id": "sweet_image",
+      "label": "Sweet side image"
+    },
+    {
+      "type": "image_picker",
+      "id": "savoury_image",
+      "label": "Savoury side image"
     },
     {
       "type": "url",

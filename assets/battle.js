@@ -332,6 +332,13 @@
       return Math.abs(sweetRevenue - savouryRevenue);
     }
 
+    getLeadPercent() {
+      const { sweetRevenue, savouryRevenue } = this.state;
+      const total = sweetRevenue + savouryRevenue;
+      if (total === 0) return 0;
+      return Math.round((Math.abs(sweetRevenue - savouryRevenue) / total) * 100);
+    }
+
     getTimeSinceUpdate() {
       if (!this.state.lastUpdated) return 0;
       const now = Date.now();
@@ -340,13 +347,12 @@
 
     buildTickerMessages() {
       const leader = this.getLeader();
-      const diff = this.getLeadDifference();
+      const diffPercent = this.getLeadPercent();
       const timeSince = this.getTimeSinceUpdate();
-      const diffFormatted = formatCurrency(diff, this.locale, this.currency);
 
       let leadMessage = 'Battle is tied.';
-      if (leader === 'Sweet') leadMessage = `Sweet leads by ${diffFormatted}`;
-      if (leader === 'Savoury') leadMessage = `Savoury leads by ${diffFormatted}`;
+      if (leader === 'Sweet') leadMessage = `Sweet leads by ${diffPercent}%`;
+      if (leader === 'Savoury') leadMessage = `Savoury leads by ${diffPercent}%`;
 
       let gapMessage = 'Score still shifting.';
       if (leader === 'Sweet') gapMessage = 'Savoury closing the gap.';
