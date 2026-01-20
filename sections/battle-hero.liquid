@@ -1,6 +1,7 @@
 {% liquid
-  assign sweet_collection = section.settings.sweet_collection
-  assign savoury_collection = section.settings.savoury_collection
+  assign collection_list = section.settings.collection_list
+  assign sweet_collection = collection_list.first
+  assign savoury_collection = collection_list[1]
   assign max_products = section.settings.max_products
   assign sweet_url = sweet_collection.url | default: '#'
   assign savoury_url = savoury_collection.url | default: '#'
@@ -273,13 +274,7 @@
                   {% endif %}
                 </div>
                 <div class="battle-hero__highlight-content">
-                  {% if block.settings.eyebrow != blank %}
-                    <p class="battle-hero__highlight-eyebrow">{{ block.settings.eyebrow }}</p>
-                  {% endif %}
                   <h3 class="battle-hero__highlight-title">{{ block.settings.heading }}</h3>
-                  {% if block.settings.subheading != blank %}
-                    <p class="battle-hero__highlight-subtitle">{{ block.settings.subheading }}</p>
-                  {% endif %}
                 </div>
             {% if block.settings.link != blank %}
               </a>
@@ -746,14 +741,9 @@
       "default": "Shop Savoury Side"
     },
     {
-      "type": "collection",
-      "id": "sweet_collection",
-      "label": "Sweet collection"
-    },
-    {
-      "type": "collection",
-      "id": "savoury_collection",
-      "label": "Savoury collection"
+      "type": "collection_list",
+      "id": "collection_list",
+      "label": "Battle collections (Sweet first, Savoury second)"
     },
     {
       "type": "range",
@@ -813,21 +803,9 @@
         },
         {
           "type": "text",
-          "id": "eyebrow",
-          "label": "Eyebrow",
-          "default": ""
-        },
-        {
-          "type": "text",
           "id": "heading",
           "label": "Heading",
-          "default": "Best seller item"
-        },
-        {
-          "type": "text",
-          "id": "subheading",
-          "label": "Subheading",
-          "default": ""
+          "default": "Best Seller Item"
         },
         {
           "type": "url",
