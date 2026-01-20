@@ -251,13 +251,10 @@
     </div>
   </div>
 
-  {% assign highlight_blocks = section.blocks | where: 'type', 'highlight' %}
-  {% if highlight_blocks.size > 0 %}
+  {% if section.blocks.size > 0 %}
     <div class="battle-hero__highlights">
       <div class="battle-hero__highlights-grid">
-        {% for block in highlight_blocks %}
-          {% content_for 'block', type: 'highlight', id: block.id %}
-        {% endfor %}
+        {% content_for 'blocks' %}
       </div>
     </div>
   {% endif %}
@@ -768,13 +765,7 @@
   ],
   "blocks": [
     {
-      "type": "_product-card"
-    },
-    {
       "type": "highlight"
-    },
-    {
-      "type": "@app"
     }
   ],
   "presets": [
