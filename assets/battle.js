@@ -1,5 +1,7 @@
 (() => {
-  const SELECTOR = '[data-battle-hero]';
+  const HERO_SELECTOR = '[data-battle-hero]';
+  const ANNOUNCEMENT_SELECTOR = '[data-battle-announcement]';
+  const stores = new Map();
 
   const toNumber = (value) => {
     if (typeof value === 'number') return value;
@@ -32,8 +34,93 @@
       }).format(safeValue);
     } catch (error) {
       const rounded = Math.round(safeValue);
-      return `\\u00a3${rounded.toLocaleString()}`;
+      return `\u00a3${rounded.toLocaleString()}`;
     }
+  };
+
+  class BattleStore {
+    constructor(endpoint, pollMin, pollMax) {
+      this.endpoint = endpoint;
+      this.pollMin = pollMin;
+      this.pollMax = pollMax;
+      this.state = {
+        sweetRevenue: 0,
+        savouryRevenue: 0,
+        lastUpdated: null,
+      };
+      this.subscribers = new Set();
+      this.started = false;
+      this.pollTimer = null;
+    }
+
+    updatePolling(pollMin, pollMax) {
+      const min = Math.min(pollMin, pollMax);
+      const max = Math.max(pollMin, pollMax);
+      this.pollMin = Math.min(this.pollMin, min);
+      this.pollMax = Math.min(this.pollMax, max);
+      if (this.pollMax < this.pollMin) this.pollMax = this.pollMin;
+    }
+
+    subscribe(callback) {
+      this.subscribers.add(callback);
+      callback(this.state);
+      this.start();
+      return () => this.subscribers.delete(callback);
+    }
+
+    start() {
+      if (this.started) return;
+      this.started = true;
+      this.fetchState();
+    }
+
+    notify() {
+      this.subscribers.forEach((callback) => callback(this.state));
+    }
+
+    async fetchState() {
+      // The /battle-state.json datastore should be updated by Shopify order webhooks.
+      // TikTok Shop orders should feed into the same datastore to keep totals unified.
+      try {
+        const response = await fetch(this.endpoint, {
+          headers: { Accept: 'application/json' },
+          cache: 'no-store',
+        });
+
+        if (!response.ok) throw new Error(`Battle state request failed: ${response.status}`);
+        const data = await response.json();
+
+        this.state = {
+          sweetRevenue: clamp(toNumber(data.sweetRevenue), 0, Number.MAX_SAFE_INTEGER),
+          savouryRevenue: clamp(toNumber(data.savouryRevenue), 0, Number.MAX_SAFE_INTEGER),
+          lastUpdated: data.lastUpdated ? new Date(data.lastUpdated) : new Date(),
+        };
+
+        this.notify();
+      } catch (error) {
+        console.warn('[battle] Failed to load battle state', error);
+      } finally {
+        this.scheduleNextPoll();
+      }
+    }
+
+    scheduleNextPoll() {
+      if (this.pollTimer) window.clearTimeout(this.pollTimer);
+      const min = Math.min(this.pollMin, this.pollMax);
+      const max = Math.max(this.pollMin, this.pollMax);
+      const delay = Math.floor(Math.random() * (max - min + 1) + min);
+      this.pollTimer = window.setTimeout(() => this.fetchState(), delay);
+    }
+  }
+
+  const getStore = ({ endpoint, pollMin, pollMax }) => {
+    const key = endpoint;
+    if (!stores.has(key)) {
+      stores.set(key, new BattleStore(endpoint, pollMin, pollMax));
+    } else {
+      stores.get(key).updatePolling(pollMin, pollMax);
+    }
+    return stores.get(key);
   };
 
   class BattleHero {
@@ -54,7 +141,6 @@
         savouryRevenue: section.querySelectorAll('[data-battle-savoury-revenue]'),
         headline: section.querySelector('[data-battle-headline]'),
         countdown: section.querySelector('[data-battle-countdown]'),
-        ticker: section.querySelector('[data-battle-ticker]'),
         lock: section.querySelector('[data-battle-lock]'),
         winner: section.querySelector('[data-battle-winner]'),
       };
@@ -65,54 +151,21 @@
         lastUpdated: null,
       };
 
-      this.tickerIndex = 0;
-      this.tickerTimer = null;
-      this.pollTimer = null;
       this.countdownTimer = null;
       this.isLocked = false;
 
-      this.init();
-    }
+      const store = getStore({
+        endpoint: this.endpoint,
+        pollMin: this.pollMin,
+        pollMax: this.pollMax,
+      });
 
-    init() {
-      this.updateUI();
-      this.fetchState();
-      this.startCountdown();
-    }
-
-    async fetchState() {
-      if (this.isLocked) return;
-
-      // The /battle-state.json datastore should be updated by Shopify order webhooks.
-      // TikTok Shop orders should feed into the same datastore to keep totals unified.
-      try {
-        const response = await fetch(this.endpoint, {
-          headers: { Accept: 'application/json' },
-          cache: 'no-store',
-        });
-
-        if (!response.ok) throw new Error(`Battle state request failed: ${response.status}`);
-        const data = await response.json();
-
-        this.state.sweetRevenue = clamp(toNumber(data.sweetRevenue), 0, Number.MAX_SAFE_INTEGER);
-        this.state.savouryRevenue = clamp(toNumber(data.savouryRevenue), 0, Number.MAX_SAFE_INTEGER);
-        this.state.lastUpdated = data.lastUpdated ? new Date(data.lastUpdated) : new Date();
-
+      store.subscribe((state) => {
+        this.state = state;
         this.updateUI();
-      } catch (error) {
-        console.warn('[battle] Failed to load battle state', error);
-      } finally {
-        this.scheduleNextPoll();
-      }
-    }
+      });
 
-    scheduleNextPoll() {
-      if (this.isLocked) return;
-      if (this.pollTimer) window.clearTimeout(this.pollTimer);
-      const min = Math.min(this.pollMin, this.pollMax);
-      const max = Math.max(this.pollMin, this.pollMax);
-      const delay = Math.floor(Math.random() * (max - min + 1) + min);
-      this.pollTimer = window.setTimeout(() => this.fetchState(), delay);
+      this.startCountdown();
     }
 
     startCountdown() {
@@ -139,19 +192,22 @@
     lockBattle() {
       if (this.isLocked) return;
       this.isLocked = true;
-      if (this.pollTimer) window.clearTimeout(this.pollTimer);
       if (this.countdownTimer) window.clearInterval(this.countdownTimer);
-      if (this.tickerTimer) window.clearInterval(this.tickerTimer);
 
-      const winner = this.getLeader();
-      if (this.elements.winner) {
-        this.elements.winner.textContent = winner === 'Tie' ? 'Tie' : winner;
-      }
+      this.updateWinner();
+
       if (this.elements.lock) {
         this.elements.lock.hidden = false;
       }
 
       this.section.classList.add('is-locked');
+    }
+
+    updateWinner() {
+      const winner = this.getLeader();
+      if (this.elements.winner) {
+        this.elements.winner.textContent = winner === 'Tie' ? 'Tie' : winner;
+      }
     }
 
     getLeader() {
@@ -167,17 +223,6 @@
       const sweetPercent = Math.round((sweetRevenue / total) * 100);
       const savouryPercent = clamp(100 - sweetPercent, 0, 100);
       return { sweet: sweetPercent, savoury: savouryPercent };
-    }
-
-    getLeadDifference() {
-      const { sweetRevenue, savouryRevenue } = this.state;
-      return Math.abs(sweetRevenue - savouryRevenue);
-    }
-
-    getTimeSinceUpdate() {
-      if (!this.state.lastUpdated) return 0;
-      const now = Date.now();
-      return Math.max(0, Math.floor((now - this.state.lastUpdated.getTime()) / 1000));
     }
 
     updateUI() {
@@ -217,7 +262,57 @@
       if (leader === 'Sweet') this.section.classList.add('is-leading-sweet');
       if (leader === 'Savoury') this.section.classList.add('is-leading-savoury');
 
-      this.updateTicker();
+      if (this.isLocked) {
+        this.updateWinner();
+      }
+    }
+  }
+
+  class BattleAnnouncement {
+    constructor(section) {
+      this.section = section;
+      this.endpoint = section.dataset.endpoint || '/battle-state.json';
+      this.pollMin = toNumber(section.dataset.pollMin) || 10000;
+      this.pollMax = toNumber(section.dataset.pollMax) || 30000;
+      this.locale = section.dataset.locale || navigator.language || 'en-GB';
+      this.currency = section.dataset.currency || 'GBP';
+
+      this.ticker = section.querySelector('[data-battle-ticker]');
+      this.state = {
+        sweetRevenue: 0,
+        savouryRevenue: 0,
+        lastUpdated: null,
+      };
+      this.tickerIndex = 0;
+      this.tickerTimer = null;
+
+      const store = getStore({
+        endpoint: this.endpoint,
+        pollMin: this.pollMin,
+        pollMax: this.pollMax,
+      });
+
+      store.subscribe((state) => {
+        this.state = state;
+        this.updateTicker();
+      });
+    }
+
+    getLeader() {
+      const { sweetRevenue, savouryRevenue } = this.state;
+      if (sweetRevenue === savouryRevenue) return 'Tie';
+      return sweetRevenue > savouryRevenue ? 'Sweet' : 'Savoury';
+    }
+
+    getLeadDifference() {
+      const { sweetRevenue, savouryRevenue } = this.state;
+      return Math.abs(sweetRevenue - savouryRevenue);
+    }
+
+    getTimeSinceUpdate() {
+      if (!this.state.lastUpdated) return 0;
+      const now = Date.now();
+      return Math.max(0, Math.floor((now - this.state.lastUpdated.getTime()) / 1000));
     }
 
     buildTickerMessages() {
@@ -240,9 +335,9 @@
     }
 
     updateTicker() {
-      if (!this.elements.ticker || this.isLocked) return;
+      if (!this.ticker) return;
       const messages = this.buildTickerMessages();
-      this.elements.ticker.textContent = messages[this.tickerIndex % messages.length];
+      this.ticker.textContent = messages[this.tickerIndex % messages.length];
 
       if (!this.tickerTimer) {
         this.tickerTimer = window.setInterval(() => {
@@ -253,7 +348,11 @@
     }
   }
 
-  document.querySelectorAll(SELECTOR).forEach((section) => {
+  document.querySelectorAll(HERO_SELECTOR).forEach((section) => {
     new BattleHero(section);
+  });
+
+  document.querySelectorAll(ANNOUNCEMENT_SELECTOR).forEach((section) => {
+    new BattleAnnouncement(section);
   });
 })();

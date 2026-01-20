@@ -1,0 +1,96 @@
+<section
+  class="battle-announcement color-{{ section.settings.color_scheme }}"
+  data-battle-announcement
+  data-endpoint="{{ section.settings.endpoint | escape }}"
+  data-poll-min="{{ section.settings.poll_min | times: 1000 }}"
+  data-poll-max="{{ section.settings.poll_max | times: 1000 }}"
+  data-locale="{{ request.locale.iso_code | default: 'en-GB' }}"
+  data-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+>
+  <div class="battle-announcement__bar" role="status" aria-live="polite">
+    <span class="battle-announcement__label">{{ section.settings.label }}</span>
+    <span class="battle-announcement__message" data-battle-ticker>Loading live scores...</span>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .battle-announcement {
+    position: sticky;
+    top: var(--header-height, 0px);
+    z-index: var(--layer-sticky);
+    background: var(--color-background);
+    color: var(--color-foreground);
+    border-bottom: 1px solid rgb(var(--color-border-rgb) / 0.2);
+  }
+
+  #shopify-section-{{ section.id }} .battle-announcement__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-announcement__label {
+    font-weight: 600;
+  }
+{% endstyle %}
+
+<script src="{{ 'battle.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Battle announcement",
+  "class": "battle-announcement-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Rotating alert ticker"
+    },
+    {
+      "type": "text",
+      "id": "endpoint",
+      "label": "Battle state endpoint",
+      "default": "/battle-state.json"
+    },
+    {
+      "type": "range",
+      "id": "poll_min",
+      "label": "Poll minimum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "poll_max",
+      "label": "Poll maximum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 24
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle announcement"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["footer"]
+  }
+}
+{% endschema %}

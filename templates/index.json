@@ -8,8 +8,37 @@
  * ------------------------------------------------------------
  */{
   "sections": {
+    "battle_announcement": {
+      "type": "battle-announcement",
+      "settings": {
+        "label": "Rotating alert ticker",
+        "endpoint": "/battle-state.json",
+        "poll_min": 12,
+        "poll_max": 24,
+        "color_scheme": "scheme-1"
+      }
+    },
     "battle_hero": {
       "type": "battle-hero",
+      "settings": {
+        "heading": "Sweet vs Savoury",
+        "subheading": "Battle for the win",
+        "eyebrow": "60 days - Battle for the win",
+        "sweet_label": "Team Sweet",
+        "savoury_label": "Team Savoury",
+        "sweet_button_label": "Shop Sweet Side",
+        "savoury_button_label": "Shop Savoury Side",
+        "sweet_link": "",
+        "savoury_link": "",
+        "end_date": "2026-02-01T00:00:00Z",
+        "endpoint": "/battle-state.json",
+        "poll_min": 12,
+        "poll_max": 24,
+        "color_scheme": "scheme-1"
+      }
+    },
+    "battle_collections": {
+      "type": "battle-collections",
       "blocks": {
         "battle-product-card": {
           "type": "_product-card",
@@ -118,13 +147,6 @@
         "highlight-3"
       ],
       "settings": {
-        "heading": "Sweet vs Savoury",
-        "subheading": "Battle for the win",
-        "eyebrow": "60 days - Battle for the win",
-        "sweet_label": "Team Sweet",
-        "savoury_label": "Team Savoury",
-        "sweet_button_label": "Shop Sweet Side",
-        "savoury_button_label": "Shop Savoury Side",
         "products_heading": "Featured items",
         "sweet_products_heading": "Top Sweet Picks",
         "savoury_products_heading": "Top Savoury Picks",
@@ -132,15 +154,13 @@
         "savoury_link_label": "Shop Savoury Side",
         "collection_list": [],
         "max_products": 4,
-        "end_date": "2026-02-01T00:00:00Z",
-        "endpoint": "/battle-state.json",
-        "poll_min": 12,
-        "poll_max": 24,
         "color_scheme": "scheme-1"
       }
     }
   },
   "order": [
-    "battle_hero"
+    "battle_announcement",
+    "battle_hero",
+    "battle_collections"
   ]
 }

@@ -1,10 +1,6 @@
 {% liquid
-  assign collection_list = section.settings.collection_list
-  assign sweet_collection = collection_list.first
-  assign savoury_collection = collection_list[1]
-  assign max_products = section.settings.max_products
-  assign sweet_url = sweet_collection.url | default: '#'
-  assign savoury_url = savoury_collection.url | default: '#'
+  assign sweet_url = section.settings.sweet_link | default: '#'
+  assign savoury_url = section.settings.savoury_link | default: '#'
 %}
 
 <section
@@ -17,19 +13,11 @@
   data-locale="{{ request.locale.iso_code | default: 'en-GB' }}"
   data-currency="{{ cart.currency.iso_code | default: shop.currency }}"
 >
-  <div class="battle-hero__ticker" role="status" aria-live="polite">
-    <div class="battle-hero__ticker-inner">
-      <span class="battle-hero__ticker-label">Live battle</span>
-      <span class="battle-hero__ticker-message" data-battle-ticker>Loading live scores...</span>
-    </div>
-  </div>
-
   <div class="battle-hero__stage">
     <div class="battle-hero__side battle-hero__side--sweet">
       <div class="battle-hero__side-inner">
         <p class="battle-hero__side-label">{{ section.settings.sweet_label }}</p>
         <p class="battle-hero__side-revenue" data-battle-sweet-revenue>0</p>
-        <a class="button button-secondary battle-hero__shop" href="{{ sweet_url }}">{{ section.settings.sweet_button_label }}</a>
       </div>
     </div>
 
@@ -37,7 +25,6 @@
       <div class="battle-hero__side-inner">
         <p class="battle-hero__side-label">{{ section.settings.savoury_label }}</p>
         <p class="battle-hero__side-revenue" data-battle-savoury-revenue>0</p>
-        <a class="button button-secondary battle-hero__shop" href="{{ savoury_url }}">{{ section.settings.savoury_button_label }}</a>
       </div>
     </div>
 
@@ -80,184 +67,6 @@
       </div>
     </div>
   </div>
-
-  <div class="battle-hero__products">
-    <div class="battle-hero__products-header">
-      <h3 class="battle-hero__products-title">{{ section.settings.products_heading }}</h3>
-    </div>
-
-    <div class="battle-hero__products-grid">
-      <div class="battle-hero__products-column">
-        <div class="battle-hero__products-column-header">
-          <h4>{{ section.settings.sweet_products_heading }}</h4>
-          <a class="battle-hero__link" href="{{ sweet_url }}">{{ section.settings.sweet_link_label }}</a>
-        </div>
-        <div class="battle-hero__product-grid">
-          {% if sweet_collection != blank and shop.products_count != 0 %}
-            {% for product in sweet_collection.products limit: max_products %}
-              <div class="battle-hero__product-card">
-                {% # theme-check-disable UniqueStaticBlockId %}
-                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: product %}
-                {% # theme-check-enable UniqueStaticBlockId %}
-                {% if product != blank %}
-                  {% liquid
-                    assign variant = product.selected_or_first_available_variant
-                    assign can_add_to_cart = false
-                    assign add_to_cart_text = 'products.product.add_to_cart' | t
-
-                    if variant == blank
-                      assign can_add_to_cart = false
-                      assign add_to_cart_text = 'products.product.unavailable' | t
-                    elsif variant.available
-                      assign can_add_to_cart = true
-                      assign add_to_cart_text = 'products.product.add_to_cart' | t
-                    else
-                      assign can_add_to_cart = false
-                      assign add_to_cart_text = 'products.product.sold_out' | t
-                    endif
-
-                    assign product_form_id = 'BattleHero-ProductForm-' | append: section.id | append: '-' | append: product.id
-                    assign add_button_id = 'BattleHero-AddToCart-' | append: section.id | append: '-' | append: product.id
-                  %}
-                  <product-form-component
-                    class="battle-hero__buy"
-                    data-section-id="{{ section.id }}"
-                    data-product-id="{{ product.id }}"
-                    data-product-url="{{ product.url }}"
-                    on:submit="/handleSubmit"
-                    data-quantity-default="1"
-                    data-quantity-error-max="{{ 'products.product.quantity_error_max' | t }}"
-                  >
-                    <div
-                      class="visually-hidden"
-                      aria-live="assertive"
-                      role="status"
-                      aria-atomic="true"
-                      ref="liveRegion"
-                    ></div>
-                    {%- form 'product', product, id: product_form_id, data-type: 'add-to-cart-form' -%}
-                      <input
-                        type="hidden"
-                        name="id"
-                        ref="variantId"
-                        value="{{ variant.id }}"
-                        {% unless can_add_to_cart %}disabled{% endunless %}
-                      >
-                      <input type="hidden" name="quantity" value="1">
-                      {% render 'add-to-cart-button',
-                        id: add_button_id,
-                        class: 'button button-secondary battle-hero__buy-button add-to-cart-button',
-                        can_add_to_cart: can_add_to_cart,
-                        product: product,
-                        add_to_cart_text: add_to_cart_text
-                      %}
-                    {%- endform -%}
-                  </product-form-component>
-                {% endif %}
-              </div>
-            {% endfor %}
-          {% else %}
-            {% for i in (1..max_products) %}
-              <div class="battle-hero__product-card">
-                {% # theme-check-disable UniqueStaticBlockId %}
-                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: null %}
-                {% # theme-check-enable UniqueStaticBlockId %}
-              </div>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-
-      <div class="battle-hero__products-column">
-        <div class="battle-hero__products-column-header">
-          <h4>{{ section.settings.savoury_products_heading }}</h4>
-          <a class="battle-hero__link" href="{{ savoury_url }}">{{ section.settings.savoury_link_label }}</a>
-        </div>
-        <div class="battle-hero__product-grid">
-          {% if savoury_collection != blank and shop.products_count != 0 %}
-            {% for product in savoury_collection.products limit: max_products %}
-              <div class="battle-hero__product-card">
-                {% # theme-check-disable UniqueStaticBlockId %}
-                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: product %}
-                {% # theme-check-enable UniqueStaticBlockId %}
-                {% if product != blank %}
-                  {% liquid
-                    assign variant = product.selected_or_first_available_variant
-                    assign can_add_to_cart = false
-                    assign add_to_cart_text = 'products.product.add_to_cart' | t
-
-                    if variant == blank
-                      assign can_add_to_cart = false
-                      assign add_to_cart_text = 'products.product.unavailable' | t
-                    elsif variant.available
-                      assign can_add_to_cart = true
-                      assign add_to_cart_text = 'products.product.add_to_cart' | t
-                    else
-                      assign can_add_to_cart = false
-                      assign add_to_cart_text = 'products.product.sold_out' | t
-                    endif
-
-                    assign product_form_id = 'BattleHero-ProductForm-' | append: section.id | append: '-' | append: product.id
-                    assign add_button_id = 'BattleHero-AddToCart-' | append: section.id | append: '-' | append: product.id
-                  %}
-                  <product-form-component
-                    class="battle-hero__buy"
-                    data-section-id="{{ section.id }}"
-                    data-product-id="{{ product.id }}"
-                    data-product-url="{{ product.url }}"
-                    on:submit="/handleSubmit"
-                    data-quantity-default="1"
-                    data-quantity-error-max="{{ 'products.product.quantity_error_max' | t }}"
-                  >
-                    <div
-                      class="visually-hidden"
-                      aria-live="assertive"
-                      role="status"
-                      aria-atomic="true"
-                      ref="liveRegion"
-                    ></div>
-                    {%- form 'product', product, id: product_form_id, data-type: 'add-to-cart-form' -%}
-                      <input
-                        type="hidden"
-                        name="id"
-                        ref="variantId"
-                        value="{{ variant.id }}"
-                        {% unless can_add_to_cart %}disabled{% endunless %}
-                      >
-                      <input type="hidden" name="quantity" value="1">
-                      {% render 'add-to-cart-button',
-                        id: add_button_id,
-                        class: 'button button-secondary battle-hero__buy-button add-to-cart-button',
-                        can_add_to_cart: can_add_to_cart,
-                        product: product,
-                        add_to_cart_text: add_to_cart_text
-                      %}
-                    {%- endform -%}
-                  </product-form-component>
-                {% endif %}
-              </div>
-            {% endfor %}
-          {% else %}
-            {% for i in (1..max_products) %}
-              <div class="battle-hero__product-card">
-                {% # theme-check-disable UniqueStaticBlockId %}
-                  {% content_for 'block', type: '_product-card', id: 'battle-product-card', closest.product: null %}
-                {% # theme-check-enable UniqueStaticBlockId %}
-              </div>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {% if section.blocks.size > 0 %}
-    <div class="battle-hero__highlights">
-      <div class="battle-hero__highlights-grid">
-        {% content_for 'blocks' %}
-      </div>
-    </div>
-  {% endif %}
 </section>
 
 {% style %}
@@ -272,29 +81,6 @@
     overflow: hidden;
     background: var(--color-background);
     color: var(--color-foreground);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__ticker {
-    position: sticky;
-    top: var(--header-height, 0px);
-    z-index: var(--layer-sticky);
-    background: var(--color-background);
-    border-bottom: 1px solid var(--battle-border);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__ticker-inner {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    justify-content: center;
-    padding: 10px 16px;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__ticker-label {
-    font-weight: 600;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__stage {
@@ -335,10 +121,6 @@
   #shopify-section-{{ section.id }} .battle-hero__side-revenue {
     font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-weight: 700;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__shop {
-    width: fit-content;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__overlay {
@@ -388,18 +170,6 @@
     margin-top: 12px;
   }
 
-  #shopify-section-{{ section.id }} .battle-hero__cta-row {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__cta {
-    min-width: min(220px, 100%);
-  }
-
   #shopify-section-{{ section.id }} .battle-hero__percent {
     display: grid;
     gap: 4px;
@@ -439,6 +209,18 @@
     color: rgb(var(--color-background-rgb));
   }
 
+  #shopify-section-{{ section.id }} .battle-hero__cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__cta {
+    min-width: min(220px, 100%);
+  }
+
   #shopify-section-{{ section.id }} .battle-hero__lock {
     position: absolute;
     inset: 0;
@@ -451,123 +233,9 @@
     z-index: var(--layer-overlay);
   }
 
-  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__stage,
-  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__products,
-  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__highlights {
+  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__stage {
     pointer-events: none;
     filter: grayscale(0.2);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__products {
-    padding: clamp(32px, 6vw, 64px) clamp(16px, 4vw, 64px);
-    border-top: 1px solid var(--battle-border);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__products-title {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.9rem;
-    text-align: center;
-    margin-bottom: 24px;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__products-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(20px, 4vw, 48px);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__products-column-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__link {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__product-grid {
-    display: grid;
-    gap: var(--battle-gap);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__product-card {
-    display: grid;
-    gap: 10px;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__buy {
-    display: block;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__buy-button {
-    width: 100%;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlights {
-    padding: 0 clamp(16px, 4vw, 64px) clamp(40px, 6vw, 72px);
-    border-top: 1px solid var(--battle-border);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlights-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--battle-gap);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-card {
-    border: 1px solid var(--battle-border);
-    background: rgb(var(--color-foreground-rgb) / 0.03);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-link {
-    display: grid;
-    height: 100%;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-media {
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    background: rgb(var(--color-foreground-rgb) / 0.06);
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-content {
-    padding: 16px;
-    display: grid;
-    gap: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-eyebrow {
-    font-size: 0.75rem;
-    opacity: 0.7;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-title {
-    font-size: 1rem;
-    margin: 0;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__highlight-subtitle {
-    font-size: 0.85rem;
-    text-transform: none;
-    letter-spacing: normal;
-    margin: 0;
   }
 
   #shopify-section-{{ section.id }} .battle-hero.is-leading-sweet .battle-hero__side--sweet::after,
@@ -610,14 +278,6 @@
 
     #shopify-section-{{ section.id }} .battle-hero__bar-label {
       color: var(--color-foreground);
-    }
-
-    #shopify-section-{{ section.id }} .battle-hero__products-grid {
-      grid-template-columns: 1fr;
-    }
-
-    #shopify-section-{{ section.id }} .battle-hero__highlights-grid {
-      grid-template-columns: 1fr;
     }
   }
 
@@ -683,48 +343,14 @@
       "default": "Shop Savoury Side"
     },
     {
-      "type": "text",
-      "id": "products_heading",
-      "label": "Products heading",
-      "default": "Featured items"
+      "type": "url",
+      "id": "sweet_link",
+      "label": "Sweet link"
     },
     {
-      "type": "text",
-      "id": "sweet_products_heading",
-      "label": "Sweet products heading",
-      "default": "Top Sweet Picks"
-    },
-    {
-      "type": "text",
-      "id": "savoury_products_heading",
-      "label": "Savoury products heading",
-      "default": "Top Savoury Picks"
-    },
-    {
-      "type": "text",
-      "id": "sweet_link_label",
-      "label": "Sweet link label",
-      "default": "Shop Sweet Side"
-    },
-    {
-      "type": "text",
-      "id": "savoury_link_label",
-      "label": "Savoury link label",
-      "default": "Shop Savoury Side"
-    },
-    {
-      "type": "collection_list",
-      "id": "collection_list",
-      "label": "Battle collections (Sweet first, Savoury second)"
-    },
-    {
-      "type": "range",
-      "id": "max_products",
-      "label": "Products per side",
-      "min": 2,
-      "max": 8,
-      "step": 1,
-      "default": 4
+      "type": "url",
+      "id": "savoury_link",
+      "label": "Savoury link"
     },
     {
       "type": "text",
@@ -763,117 +389,9 @@
       "default": "scheme-1"
     }
   ],
-  "blocks": [
-    {
-      "type": "highlight"
-    }
-  ],
   "presets": [
     {
-      "name": "Battle hero",
-      "blocks": {
-        "battle-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 4,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product-card-gallery": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              }
-            },
-            "product_title": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              }
-            },
-            "price": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "color": "var(--color-foreground)",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              }
-            }
-          },
-          "block_order": ["product-card-gallery", "product_title", "price"]
-        },
-        "highlight-1": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Best Seller Item"
-          }
-        },
-        "highlight-2": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Limited Edition Drop"
-          }
-        },
-        "highlight-3": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Clutch Item +3 Votes"
-          }
-        }
-      },
-      "block_order": ["highlight-1", "highlight-2", "highlight-3"]
+      "name": "Battle hero"
     }
   ],
   "disabled_on": {

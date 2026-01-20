@@ -4,21 +4,21 @@
   assign image = block.settings.image
 %}
 
-<div class="battle-hero__highlight-card" {{ block.shopify_attributes }}>
+<div class="battle-collection__highlight-card" {{ block.shopify_attributes }}>
   {% if link != blank %}
-    <a class="battle-hero__highlight-link" href="{{ link }}">
+    <a class="battle-collection__highlight-link" href="{{ link }}">
   {% else %}
-    <div class="battle-hero__highlight-link">
+    <div class="battle-collection__highlight-link">
   {% endif %}
-      <div class="battle-hero__highlight-media">
+      <div class="battle-collection__highlight-media">
         {% if image != blank %}
-          {{ image | image_url: width: 1200 | image_tag: class: 'battle-hero__highlight-image', loading: 'lazy' }}
+          {{ image | image_url: width: 1200 | image_tag: class: 'battle-collection__highlight-image', loading: 'lazy' }}
         {% else %}
-          {{ 'hero-apparel-1' | placeholder_svg_tag: 'battle-hero__highlight-image battle-hero__highlight-placeholder' }}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'battle-collection__highlight-image battle-collection__highlight-placeholder' }}
         {% endif %}
       </div>
-      <div class="battle-hero__highlight-content">
-        <h3 class="battle-hero__highlight-title">{{ heading }}</h3>
+      <div class="battle-collection__highlight-content">
+        <h3 class="battle-collection__highlight-title">{{ heading }}</h3>
       </div>
   {% if link != blank %}
     </a>
