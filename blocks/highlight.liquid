@@ -1,0 +1,53 @@
+{% liquid
+  assign heading = block.settings.heading
+  assign link = block.settings.link
+  assign image = block.settings.image
+%}
+
+<div class="battle-hero__highlight-card" {{ block.shopify_attributes }}>
+  {% if link != blank %}
+    <a class="battle-hero__highlight-link" href="{{ link }}">
+  {% else %}
+    <div class="battle-hero__highlight-link">
+  {% endif %}
+      <div class="battle-hero__highlight-media">
+        {% if image != blank %}
+          {{ image | image_url: width: 1200 | image_tag: class: 'battle-hero__highlight-image', loading: 'lazy' }}
+        {% else %}
+          {{ 'hero-apparel-1' | placeholder_svg_tag: 'battle-hero__highlight-image battle-hero__highlight-placeholder' }}
+        {% endif %}
+      </div>
+      <div class="battle-hero__highlight-content">
+        <h3 class="battle-hero__highlight-title">{{ heading }}</h3>
+      </div>
+  {% if link != blank %}
+    </a>
+  {% else %}
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Highlight card",
+  "tag": null,
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Best Seller Item"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    }
+  ]
+}
+{% endschema %}
