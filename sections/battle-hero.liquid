@@ -65,6 +65,11 @@
             <div class="battle-hero__team-revenue" data-battle-savoury-revenue>0</div>
           </div>
         </div>
+
+        <div class="battle-hero__cta-row">
+          <a class="button battle-hero__cta" href="{{ sweet_url }}">{{ section.settings.sweet_button_label }}</a>
+          <a class="button button-secondary battle-hero__cta" href="{{ savoury_url }}">{{ section.settings.savoury_button_label }}</a>
+        </div>
       </div>
     </div>
 
@@ -244,6 +249,48 @@
       </div>
     </div>
   </div>
+
+  {% assign highlight_blocks = section.blocks | where: 'type', 'highlight' %}
+  {% if highlight_blocks.size > 0 %}
+    <div class="battle-hero__highlights">
+      <div class="battle-hero__highlights-grid">
+        {% for block in highlight_blocks %}
+          <div class="battle-hero__highlight-card" {{ block.shopify_attributes }}>
+            {% if block.settings.link != blank %}
+              <a class="battle-hero__highlight-link" href="{{ block.settings.link }}">
+            {% else %}
+              <div class="battle-hero__highlight-link">
+            {% endif %}
+                <div class="battle-hero__highlight-media">
+                  {% if block.settings.image != blank %}
+                    {{
+                      block.settings.image
+                      | image_url: width: 1200
+                      | image_tag: class: 'battle-hero__highlight-image', loading: 'lazy'
+                    }}
+                  {% else %}
+                    {{ 'hero-apparel-1' | placeholder_svg_tag: 'battle-hero__highlight-image battle-hero__highlight-placeholder' }}
+                  {% endif %}
+                </div>
+                <div class="battle-hero__highlight-content">
+                  {% if block.settings.eyebrow != blank %}
+                    <p class="battle-hero__highlight-eyebrow">{{ block.settings.eyebrow }}</p>
+                  {% endif %}
+                  <h3 class="battle-hero__highlight-title">{{ block.settings.heading }}</h3>
+                  {% if block.settings.subheading != blank %}
+                    <p class="battle-hero__highlight-subtitle">{{ block.settings.subheading }}</p>
+                  {% endif %}
+                </div>
+            {% if block.settings.link != blank %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
 </section>
 
 {% style %}
@@ -341,6 +388,7 @@
     max-width: 720px;
     display: grid;
     gap: 12px;
+    pointer-events: auto;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__eyebrow {
@@ -371,6 +419,18 @@
     align-items: center;
     gap: 16px;
     margin-top: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__cta {
+    min-width: min(220px, 100%);
   }
 
   #shopify-section-{{ section.id }} .battle-hero__percent {
@@ -425,7 +485,8 @@
   }
 
   #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__stage,
-  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__products {
+  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__products,
+  #shopify-section-{{ section.id }} .battle-hero.is-locked .battle-hero__highlights {
     pointer-events: none;
     filter: grayscale(0.2);
   }
@@ -481,6 +542,67 @@
     width: 100%;
   }
 
+  #shopify-section-{{ section.id }} .battle-hero__highlights {
+    padding: 0 clamp(16px, 4vw, 64px) clamp(40px, 6vw, 72px);
+    border-top: 1px solid var(--battle-border);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--battle-gap);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-card {
+    border: 1px solid var(--battle-border);
+    background: rgb(var(--color-foreground-rgb) / 0.03);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-link {
+    display: grid;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: rgb(var(--color-foreground-rgb) / 0.06);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-content {
+    padding: 16px;
+    display: grid;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-eyebrow {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-title {
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__highlight-subtitle {
+    font-size: 0.85rem;
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+  }
+
   #shopify-section-{{ section.id }} .battle-hero.is-leading-sweet .battle-hero__side--sweet::after,
   #shopify-section-{{ section.id }} .battle-hero.is-leading-savoury .battle-hero__side--savoury::after {
     content: '';
@@ -524,6 +646,10 @@
     }
 
     #shopify-section-{{ section.id }} .battle-hero__products-grid {
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__highlights-grid {
       grid-template-columns: 1fr;
     }
   }
@@ -675,30 +801,57 @@
       "default": "scheme-1"
     }
   ],
-  "blocks": {
-    "battle-product-card": {
-      "type": "_product-card",
-      "name": "t:names.product_card",
-      "static": true,
-      "settings": {
-        "product_card_gap": 4,
-        "inherit_color_scheme": true,
-        "color_scheme": "",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_radius": 0,
-        "padding-block-start": 0,
-        "padding-block-end": 0,
-        "padding-inline-start": 0,
-        "padding-inline-end": 0
-      },
+  "blocks": [
+    {
+      "type": "highlight",
+      "name": "Highlight card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow",
+          "default": ""
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Best seller item"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": ""
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle hero",
       "blocks": {
-        "product-card-gallery": {
-          "type": "_product-card-gallery",
-          "name": "t:names.product_card_media",
+        "battle-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
           "settings": {
-            "image_ratio": "adapt",
+            "product_card_gap": 4,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
@@ -707,61 +860,92 @@
             "padding-block-end": 0,
             "padding-inline-start": 0,
             "padding-inline-end": 0
+          },
+          "blocks": {
+            "product-card-gallery": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
+            "product_title": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "color": "var(--color-foreground)",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 4,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            },
+            "price": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "color": "var(--color-foreground)",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              }
+            }
+          },
+          "block_order": ["product-card-gallery", "product_title", "price"]
+        },
+        "highlight-1": {
+          "type": "highlight",
+          "settings": {
+            "heading": "Best Seller Item"
           }
         },
-        "product_title": {
-          "type": "product-title",
-          "name": "t:names.product_title",
+        "highlight-2": {
+          "type": "highlight",
           "settings": {
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "rte",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "color": "var(--color-foreground)",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 4,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "heading": "Limited Edition Drop"
           }
         },
-        "price": {
-          "type": "price",
-          "name": "t:names.product_price",
+        "highlight-3": {
+          "type": "highlight",
           "settings": {
-            "show_sale_price_first": true,
-            "show_installments": false,
-            "show_tax_info": false,
-            "type_preset": "h6",
-            "width": "100%",
-            "alignment": "left",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "color": "var(--color-foreground)",
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
+            "heading": "Clutch Item +3 Votes"
           }
         }
       },
-      "block_order": ["product-card-gallery", "product_title", "price"]
-    }
-  },
-  "presets": [
-    {
-      "name": "Battle hero"
+      "block_order": ["highlight-1", "highlight-2", "highlight-3"]
     }
   ],
   "disabled_on": {
