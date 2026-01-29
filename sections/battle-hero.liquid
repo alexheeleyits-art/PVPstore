@@ -18,7 +18,6 @@
   <div class="battle-hero__stage">
     <div class="battle-hero__side battle-hero__side--sweet">
       <div class="battle-hero__side-inner">
-        <p class="battle-hero__side-label">{{ section.settings.sweet_label }}</p>
       </div>
       {% if section.settings.sweet_image != blank %}
         <div class="battle-hero__side-media battle-hero__side-media--sweet">
@@ -33,7 +32,6 @@
 
     <div class="battle-hero__side battle-hero__side--savoury">
       <div class="battle-hero__side-inner">
-        <p class="battle-hero__side-label">{{ section.settings.savoury_label }}</p>
       </div>
       {% if section.settings.savoury_image != blank %}
         <div class="battle-hero__side-media battle-hero__side-media--savoury">
@@ -172,13 +170,6 @@
     width: 100%;
     height: auto;
     display: block;
-  }
-
-  #shopify-section-{{ section.id }} .battle-hero__side-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    opacity: 0.7;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__side-revenue {
