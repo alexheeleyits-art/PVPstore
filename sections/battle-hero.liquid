@@ -52,6 +52,7 @@
         <h2 class="battle-hero__title">{{ section.settings.heading }}</h2>
         <p class="battle-hero__tagline" data-battle-countdown>{{ section.settings.subheading }}</p>
         <p class="battle-hero__leader" data-battle-headline>Awaiting the first strike...</p>
+        <div class="battle-hero__loading" data-battle-loading hidden>Loading live scores...</div>
 
         <div class="battle-hero__status-row">
           <div class="battle-hero__status battle-hero__status--sweet">
@@ -222,6 +223,29 @@
     font-weight: 700;
   }
 
+  #shopify-section-{{ section.id }} .battle-hero__loading {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__loading::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgb(var(--color-foreground-rgb) / 0.6);
+    border-right-color: transparent;
+    animation: battleSpin 0.8s linear infinite;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero.is-loading .battle-hero__loading {
+    display: inline-flex;
+  }
+
   #shopify-section-{{ section.id }} .battle-hero__status-row {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -229,6 +253,7 @@
     text-transform: uppercase;
     letter-spacing: 0.14em;
     font-size: 0.8rem;
+    transition: opacity 250ms ease, transform 250ms ease;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__status {
@@ -254,6 +279,7 @@
     align-items: center;
     gap: 16px;
     margin-top: 12px;
+    transition: opacity 250ms ease, transform 250ms ease;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__percent {
@@ -347,6 +373,7 @@
     gap: 16px;
     flex-wrap: wrap;
     margin-top: 12px;
+    transition: opacity 250ms ease, transform 250ms ease;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__cta {
@@ -382,6 +409,20 @@
     background: radial-gradient(circle at 30% 30%, rgb(var(--color-foreground-rgb) / 0.15), transparent 65%);
     animation: battlePulse 2.4s ease-in-out infinite;
     pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero.is-loading .battle-hero__status-row,
+  #shopify-section-{{ section.id }} .battle-hero.is-loading .battle-hero__scoreboard,
+  #shopify-section-{{ section.id }} .battle-hero.is-loading .battle-hero__cta-row {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px);
+  }
+
+  @keyframes battleSpin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   @keyframes battlePulse {

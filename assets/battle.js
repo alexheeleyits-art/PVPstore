@@ -47,6 +47,7 @@
         sweetRevenue: 0,
         savouryRevenue: 0,
         lastUpdated: null,
+        hasData: false,
       };
       this.subscribers = new Set();
       this.started = false;
@@ -94,6 +95,7 @@
           sweetRevenue: clamp(toNumber(data.sweetRevenue), 0, Number.MAX_SAFE_INTEGER),
           savouryRevenue: clamp(toNumber(data.savouryRevenue), 0, Number.MAX_SAFE_INTEGER),
           lastUpdated: data.lastUpdated ? new Date(data.lastUpdated) : new Date(),
+          hasData: true,
         };
 
         this.notify();
@@ -149,6 +151,7 @@
         winner: section.querySelector('[data-battle-winner]'),
         sweetStatus: section.querySelector('[data-battle-sweet-status]'),
         savouryStatus: section.querySelector('[data-battle-savoury-status]'),
+        loading: section.querySelector('[data-battle-loading]'),
       };
 
       this.state = {
@@ -232,7 +235,7 @@
     }
 
     updateUI() {
-      const { sweetRevenue, savouryRevenue } = this.state;
+      const { sweetRevenue, savouryRevenue, hasData } = this.state;
       const leader = this.getLeader();
       const { sweet, savoury } = this.getPercentages();
       let barSweet = sweet;
@@ -240,6 +243,23 @@
       if (sweetRevenue > 0 && savouryRevenue > 0) {
         const barFloor = 6;
         barSweet = clamp(sweet, barFloor, 100 - barFloor);
+      }
+
+      if (this.elements.loading) {
+        this.elements.loading.hidden = hasData;
+      }
+
+      this.section.classList.toggle('is-loading', !hasData);
+
+      if (this.elements.lock) {
+        this.elements.lock.hidden = !this.isLocked;
+      }
+
+      if (!hasData) {
+        if (this.isLocked) {
+          this.updateWinner();
+        }
+        return;
       }
 
       if (this.elements.bar) {
@@ -291,10 +311,6 @@
       if (leader === 'Sweet') this.section.classList.add('is-leading-sweet');
       if (leader === 'Savoury') this.section.classList.add('is-leading-savoury');
 
-      if (this.elements.lock) {
-        this.elements.lock.hidden = !this.isLocked;
-      }
-
       if (this.isLocked) {
         this.updateWinner();
       }
@@ -315,6 +331,7 @@
         sweetRevenue: 0,
         savouryRevenue: 0,
         lastUpdated: null,
+        hasData: false,
       };
       this.tickerIndex = 0;
       this.tickerTimer = null;
@@ -375,6 +392,10 @@
 
     updateTicker() {
       if (!this.ticker) return;
+      if (!this.state.hasData) {
+        this.ticker.textContent = 'Loading live scores...';
+        return;
+      }
       const messages = this.buildTickerMessages();
       this.ticker.textContent = messages[this.tickerIndex % messages.length];
 
