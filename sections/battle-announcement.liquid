@@ -16,11 +16,16 @@
 {% style %}
   #shopify-section-{{ section.id }} .battle-announcement {
     position: sticky;
-    top: var(--header-height, 0px);
+    top: 0;
     z-index: var(--layer-sticky);
     background: var(--color-background);
     color: var(--color-foreground);
     border-bottom: 1px solid rgb(var(--color-border-rgb) / 0.2);
+  }
+
+  .header-section:has(> #header-component[sticky='always']),
+  .header-section:has(> #header-component[sticky='scroll-up'][data-sticky-state='active']) {
+    top: calc(var(--battle-announcement-height, 0px) - 1px);
   }
 
   #shopify-section-{{ section.id }} .battle-announcement__bar {
@@ -53,6 +58,20 @@
 {% endstyle %}
 
 <script src="{{ 'battle.js' | asset_url }}" defer></script>
+<script>
+  (() => {
+    const root = document.getElementById('shopify-section-{{ section.id }}');
+    const bar = root ? root.querySelector('.battle-announcement') : null;
+    if (!bar) return;
+
+    const updateOffset = () => {
+      document.body.style.setProperty('--battle-announcement-height', `${bar.offsetHeight}px`);
+    };
+
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+  })();
+</script>
 
 {% schema %}
 {
