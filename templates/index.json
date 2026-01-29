@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "battle_announcement": {
       "type": "battle-announcement",
@@ -31,7 +32,7 @@
         "sweet_link": "",
         "savoury_link": "",
         "end_date": "2026-02-01T00:00:00Z",
-        "endpoint": "/battle-state.json",
+        "endpoint": "https://pvpshop.vercel.app/battle-state.json",
         "poll_min": 12,
         "poll_max": 24,
         "color_scheme": "scheme-1"
@@ -40,6 +41,30 @@
     "battle_collections": {
       "type": "battle-collections",
       "blocks": {
+        "highlight-1": {
+          "type": "highlight",
+          "settings": {
+            "heading": "Best Seller Item",
+            "link": ""
+          },
+          "blocks": {}
+        },
+        "highlight-2": {
+          "type": "highlight",
+          "settings": {
+            "heading": "Limited Edition Drop",
+            "link": ""
+          },
+          "blocks": {}
+        },
+        "highlight-3": {
+          "type": "highlight",
+          "settings": {
+            "heading": "Clutch Item +3 Votes",
+            "link": ""
+          },
+          "blocks": {}
+        },
         "battle-product-card": {
           "type": "_product-card",
           "name": "t:names.product_card",
@@ -71,7 +96,8 @@
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
-              }
+              },
+              "blocks": {}
             },
             "product_title": {
               "type": "product-title",
@@ -95,7 +121,8 @@
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
-              }
+              },
+              "blocks": {}
             },
             "price": {
               "type": "price",
@@ -117,28 +144,15 @@
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
-              }
+              },
+              "blocks": {}
             }
           },
-          "block_order": ["product-card-gallery", "product_title", "price"]
-        },
-        "highlight-1": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Best Seller Item"
-          }
-        },
-        "highlight-2": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Limited Edition Drop"
-          }
-        },
-        "highlight-3": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Clutch Item +3 Votes"
-          }
+          "block_order": [
+            "product-card-gallery",
+            "product_title",
+            "price"
+          ]
         }
       },
       "block_order": [
