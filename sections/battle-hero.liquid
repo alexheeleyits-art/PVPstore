@@ -15,90 +15,92 @@
   data-sweet-name="{{ section.settings.sweet_label | escape }}"
   data-savoury-name="{{ section.settings.savoury_label | escape }}"
 >
-  <div class="battle-hero__stage">
-    <div class="battle-hero__side battle-hero__side--sweet">
-      <div class="battle-hero__side-inner">
+  <div class="battle-hero__shell">
+    <div class="battle-hero__stage">
+      <div class="battle-hero__side battle-hero__side--sweet">
+        <div class="battle-hero__side-inner">
+        </div>
+        {% if section.settings.sweet_image != blank %}
+          <div class="battle-hero__side-media battle-hero__side-media--sweet">
+            {{
+              section.settings.sweet_image
+              | image_url: width: 900
+              | image_tag: class: 'battle-hero__side-image', loading: 'lazy'
+            }}
+          </div>
+        {% endif %}
       </div>
-      {% if section.settings.sweet_image != blank %}
-        <div class="battle-hero__side-media battle-hero__side-media--sweet">
-          {{
-            section.settings.sweet_image
-            | image_url: width: 900
-            | image_tag: class: 'battle-hero__side-image', loading: 'lazy'
-          }}
-        </div>
-      {% endif %}
-    </div>
 
-    <div class="battle-hero__side battle-hero__side--savoury">
-      <div class="battle-hero__side-inner">
+      <div class="battle-hero__side battle-hero__side--savoury">
+        <div class="battle-hero__side-inner">
+        </div>
+        {% if section.settings.savoury_image != blank %}
+          <div class="battle-hero__side-media battle-hero__side-media--savoury">
+            {{
+              section.settings.savoury_image
+              | image_url: width: 900
+              | image_tag: class: 'battle-hero__side-image', loading: 'lazy'
+            }}
+          </div>
+        {% endif %}
       </div>
-      {% if section.settings.savoury_image != blank %}
-        <div class="battle-hero__side-media battle-hero__side-media--savoury">
-          {{
-            section.settings.savoury_image
-            | image_url: width: 900
-            | image_tag: class: 'battle-hero__side-image', loading: 'lazy'
-          }}
-        </div>
-      {% endif %}
-    </div>
 
-    <div class="battle-hero__overlay" aria-live="polite">
-      <div class="battle-hero__overlay-inner">
-        <p class="battle-hero__eyebrow">{{ section.settings.eyebrow }}</p>
-        <h2 class="battle-hero__title">{{ section.settings.heading }}</h2>
-        <p class="battle-hero__tagline" data-battle-countdown>{{ section.settings.subheading }}</p>
-        <p class="battle-hero__leader" data-battle-headline>Awaiting the first strike...</p>
-        <div class="battle-hero__loading" data-battle-loading hidden>Loading live scores...</div>
+      <div class="battle-hero__overlay" aria-live="polite">
+        <div class="battle-hero__overlay-inner">
+          <p class="battle-hero__eyebrow">{{ section.settings.eyebrow }}</p>
+          <h2 class="battle-hero__title">{{ section.settings.heading }}</h2>
+          <p class="battle-hero__tagline" data-battle-countdown>{{ section.settings.subheading }}</p>
+          <p class="battle-hero__leader" data-battle-headline>Awaiting the first strike...</p>
+          <div class="battle-hero__loading" data-battle-loading hidden>Loading live scores...</div>
 
-        <div class="battle-hero__status-row">
-          <div class="battle-hero__status battle-hero__status--sweet">
-            <span class="battle-hero__status-label">{{ section.settings.sweet_label }}</span>
-            <span class="battle-hero__status-text" data-battle-sweet-status>Sweet takes the lead</span>
-          </div>
-          <div class="battle-hero__status battle-hero__status--savoury">
-            <span class="battle-hero__status-label">{{ section.settings.savoury_label }}</span>
-            <span class="battle-hero__status-text" data-battle-savoury-status>Savoury fighting back</span>
-          </div>
-        </div>
-
-        <div class="battle-hero__scoreboard">
-          <div class="battle-hero__percent battle-hero__percent--sweet">
-            <div class="battle-hero__percent-value" data-battle-sweet-percent>50%</div>
-            <div class="battle-hero__team">{{ section.settings.sweet_label }}</div>
-          </div>
-
-          <div class="battle-hero__bar-frame">
-            <div class="battle-hero__bar-header">Live battle progress</div>
-            <div class="battle-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
-              <span class="battle-hero__bar-fill" data-battle-bar></span>
-              <span class="battle-hero__bar-metric battle-hero__bar-metric--sweet">
-                <span data-battle-sweet-percent>50%</span>
-              </span>
-              <span class="battle-hero__bar-vs">vs</span>
-              <span class="battle-hero__bar-metric battle-hero__bar-metric--savoury">
-                <span data-battle-savoury-percent>50%</span>
-              </span>
+          <div class="battle-hero__status-row">
+            <div class="battle-hero__status battle-hero__status--sweet">
+              <span class="battle-hero__status-label">{{ section.settings.sweet_label }}</span>
+              <span class="battle-hero__status-text" data-battle-sweet-status>Sweet takes the lead</span>
+            </div>
+            <div class="battle-hero__status battle-hero__status--savoury">
+              <span class="battle-hero__status-label">{{ section.settings.savoury_label }}</span>
+              <span class="battle-hero__status-text" data-battle-savoury-status>Savoury fighting back</span>
             </div>
           </div>
 
-          <div class="battle-hero__percent battle-hero__percent--savoury">
-            <div class="battle-hero__percent-value" data-battle-savoury-percent>50%</div>
-            <div class="battle-hero__team">{{ section.settings.savoury_label }}</div>
+          <div class="battle-hero__scoreboard">
+            <div class="battle-hero__percent battle-hero__percent--sweet">
+              <div class="battle-hero__percent-value" data-battle-sweet-percent>50%</div>
+              <div class="battle-hero__team">{{ section.settings.sweet_label }}</div>
+            </div>
+
+            <div class="battle-hero__bar-frame">
+              <div class="battle-hero__bar-header">Live battle progress</div>
+              <div class="battle-hero__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+                <span class="battle-hero__bar-fill" data-battle-bar></span>
+                <span class="battle-hero__bar-metric battle-hero__bar-metric--sweet">
+                  <span data-battle-sweet-percent>50%</span>
+                </span>
+                <span class="battle-hero__bar-vs">vs</span>
+                <span class="battle-hero__bar-metric battle-hero__bar-metric--savoury">
+                  <span data-battle-savoury-percent>50%</span>
+                </span>
+              </div>
+            </div>
+
+            <div class="battle-hero__percent battle-hero__percent--savoury">
+              <div class="battle-hero__percent-value" data-battle-savoury-percent>50%</div>
+              <div class="battle-hero__team">{{ section.settings.savoury_label }}</div>
+            </div>
+          </div>
+
+          <div class="battle-hero__cta-row">
+            <a class="button battle-hero__cta" href="{{ sweet_url }}">{{ section.settings.sweet_button_label }}</a>
+            <a class="button button-secondary battle-hero__cta" href="{{ savoury_url }}">{{ section.settings.savoury_button_label }}</a>
           </div>
         </div>
-
-        <div class="battle-hero__cta-row">
-          <a class="button battle-hero__cta" href="{{ sweet_url }}">{{ section.settings.sweet_button_label }}</a>
-          <a class="button button-secondary battle-hero__cta" href="{{ savoury_url }}">{{ section.settings.savoury_button_label }}</a>
-        </div>
       </div>
-    </div>
 
-    <div class="battle-hero__lock" data-battle-lock hidden>
-      <div class="battle-hero__lock-inner">
-        Battle Over - Winner: <span data-battle-winner>Pending</span>
+      <div class="battle-hero__lock" data-battle-lock hidden>
+        <div class="battle-hero__lock-inner">
+          Battle Over - Winner: <span data-battle-winner>Pending</span>
+        </div>
       </div>
     </div>
   </div>
@@ -120,6 +122,16 @@
     overflow: hidden;
     background: var(--color-background);
     color: var(--color-foreground);
+  }
+
+  #shopify-section-{{ section.id }} .battle-hero__shell {
+    width: min(1280px, calc(100% - clamp(24px, 6vw, 72px)));
+    margin: clamp(20px, 3vw, 40px) auto;
+    border-radius: clamp(20px, 3vw, 36px);
+    overflow: hidden;
+    background: var(--color-background);
+    box-shadow: 0 30px 60px rgb(var(--color-foreground-rgb) / 0.08);
+    position: relative;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__stage {
@@ -485,6 +497,12 @@
   }
 
   @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .battle-hero__shell {
+      width: calc(100% - 24px);
+      margin: 16px auto 24px;
+      border-radius: 18px;
+    }
+
     #shopify-section-{{ section.id }} .battle-hero__stage {
       min-height: min(100svh, 720px);
       grid-template-columns: 1fr;
