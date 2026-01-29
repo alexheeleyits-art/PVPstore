@@ -139,8 +139,8 @@
 
       this.elements = {
         bar: section.querySelector('[data-battle-bar]'),
-        sweetPercent: section.querySelector('[data-battle-sweet-percent]'),
-        savouryPercent: section.querySelector('[data-battle-savoury-percent]'),
+        sweetPercent: section.querySelectorAll('[data-battle-sweet-percent]'),
+        savouryPercent: section.querySelectorAll('[data-battle-savoury-percent]'),
         sweetRevenue: section.querySelectorAll('[data-battle-sweet-revenue]'),
         savouryRevenue: section.querySelectorAll('[data-battle-savoury-revenue]'),
         headline: section.querySelector('[data-battle-headline]'),
@@ -235,15 +235,25 @@
       const { sweetRevenue, savouryRevenue } = this.state;
       const leader = this.getLeader();
       const { sweet, savoury } = this.getPercentages();
+      let barSweet = sweet;
+
+      if (sweetRevenue > 0 && savouryRevenue > 0) {
+        const barFloor = 6;
+        barSweet = clamp(sweet, barFloor, 100 - barFloor);
+      }
 
       if (this.elements.bar) {
-        this.elements.bar.style.width = `${sweet}%`;
+        this.elements.bar.style.width = `${barSweet}%`;
         const barWrapper = this.elements.bar.closest('[role="progressbar"]');
         if (barWrapper) barWrapper.setAttribute('aria-valuenow', `${sweet}`);
       }
 
-      if (this.elements.sweetPercent) this.elements.sweetPercent.textContent = `${sweet}%`;
-      if (this.elements.savouryPercent) this.elements.savouryPercent.textContent = `${savoury}%`;
+      this.elements.sweetPercent.forEach((el) => {
+        el.textContent = `${sweet}%`;
+      });
+      this.elements.savouryPercent.forEach((el) => {
+        el.textContent = `${savoury}%`;
+      });
 
       const formattedSweet = formatCurrency(sweetRevenue, this.locale, this.currency);
       const formattedSavoury = formatCurrency(savouryRevenue, this.locale, this.currency);
