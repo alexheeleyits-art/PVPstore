@@ -38,6 +38,18 @@
   #shopify-section-{{ section.id }} .battle-announcement__label {
     font-weight: 600;
   }
+
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .battle-announcement__bar {
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      gap: 8px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-announcement__label {
+      display: none;
+    }
+  }
 {% endstyle %}
 
 <script src="{{ 'battle.js' | asset_url }}" defer></script>

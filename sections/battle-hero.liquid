@@ -441,11 +441,13 @@
 
   @media screen and (max-width: 749px) {
     #shopify-section-{{ section.id }} .battle-hero__stage {
+      min-height: min(100svh, 720px);
       grid-template-columns: 1fr;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__side {
-      align-items: flex-start;
+      padding: 28px 16px 96px;
+      align-items: center;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__side--sweet {
@@ -453,17 +455,96 @@
       border-bottom: 1px solid var(--battle-border);
     }
 
-    #shopify-section-{{ section.id }} .battle-hero__scoreboard {
-      grid-template-columns: 1fr;
+    #shopify-section-{{ section.id }} .battle-hero__side-inner {
+      display: none;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__overlay {
+      padding: 28px 16px 32px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__overlay-inner {
+      gap: 10px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__title {
+      font-size: clamp(1.8rem, 8vw, 2.6rem);
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__tagline {
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__leader {
+      font-size: 1.1rem;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__status-row {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__status {
+      padding: 8px 10px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__scoreboard {
+      grid-template-columns: minmax(0, 1fr) minmax(160px, 2fr) minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__percent {
+      min-width: 0;
+      font-size: 0.75rem;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__percent-value {
+      font-size: 1.4rem;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__bar-frame {
+      padding: 8px;
+      border-radius: 12px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__bar-header {
+      font-size: 0.6rem;
+      letter-spacing: 0.16em;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__bar {
+      height: 44px;
+      border-radius: 6px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__bar-metric {
+      font-size: 1rem;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__bar-vs {
+      font-size: 0.9rem;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__cta-row {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-hero__cta {
+      width: 100%;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__side-media {
-      width: min(55%, 260px);
-      opacity: 0.9;
+      width: min(48%, 200px);
+      opacity: 0.65;
     }
   }
 
