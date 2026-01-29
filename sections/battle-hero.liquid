@@ -116,6 +116,7 @@
     --battle-savoury-bar: #d3a56f;
     --battle-bar-border: #c7b39d;
     --battle-panel: #f8efe3;
+    --battle-hero-height: clamp(560px, 82svh, 760px);
 
     position: relative;
     overflow: hidden;
@@ -124,7 +125,7 @@
   }
 
   #shopify-section-{{ section.id }} .battle-hero__stage {
-    min-height: 100svh;
+    min-height: var(--battle-hero-height);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     position: relative;
@@ -132,9 +133,9 @@
 
   #shopify-section-{{ section.id }} .battle-hero__side {
     position: relative;
-    padding: clamp(32px, 6vw, 64px) clamp(20px, 4vw, 56px);
+    padding: clamp(24px, 4vw, 56px);
     display: flex;
-    align-items: flex-end;
+    align-items: center;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__side--sweet {
@@ -155,7 +156,7 @@
   #shopify-section-{{ section.id }} .battle-hero__side-media {
     position: absolute;
     bottom: 0;
-    width: min(42%, 320px);
+    width: min(40%, 300px);
     pointer-events: none;
   }
 
@@ -189,47 +190,81 @@
     inset: 0;
     display: grid;
     place-items: center;
-    padding: clamp(20px, 4vw, 48px);
+    padding: clamp(20px, 3vw, 40px);
     text-align: center;
     pointer-events: none;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__overlay-inner {
-    max-width: 720px;
+    max-width: 860px;
     display: grid;
-    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "eyebrow countdown"
+      "title title"
+      "loading loading"
+      "leader leader"
+      "status status"
+      "scoreboard scoreboard"
+      "cta cta";
+    column-gap: clamp(16px, 4vw, 32px);
+    row-gap: 10px;
+    align-items: center;
     pointer-events: auto;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__eyebrow {
-    font-size: 0.8rem;
+    grid-area: eyebrow;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--battle-border);
+    background: rgb(var(--color-background-rgb) / 0.7);
+    font-size: 0.68rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__title {
-    font-size: clamp(2.4rem, 5vw, 4rem);
+    grid-area: title;
+    font-size: clamp(2.2rem, 4.2vw, 3.4rem);
     margin: 0;
+    letter-spacing: -0.02em;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__tagline {
-    font-size: 1rem;
-    letter-spacing: 0.06em;
+    grid-area: countdown;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--battle-border);
+    background: rgb(var(--color-background-rgb) / 0.7);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__leader {
-    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    grid-area: leader;
+    font-size: clamp(1.1rem, 2.2vw, 1.7rem);
     font-weight: 700;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__loading {
+    grid-area: loading;
     display: none;
     align-items: center;
     gap: 10px;
-    font-size: 0.7rem;
-    letter-spacing: 0.2em;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    justify-self: center;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__loading::before {
@@ -247,25 +282,29 @@
   }
 
   #shopify-section-{{ section.id }} .battle-hero__status-row {
+    grid-area: status;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 12px;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    font-size: 0.72rem;
     transition: opacity 250ms ease, transform 250ms ease;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__status {
     display: grid;
-    gap: 6px;
-    padding: 10px 14px;
+    gap: 4px;
+    padding: 8px 12px;
     border: 1px solid var(--battle-border);
-    background: rgb(var(--color-foreground-rgb) / 0.04);
+    border-radius: 999px;
+    background: rgb(var(--color-background-rgb) / 0.7);
+    justify-items: center;
+    text-align: center;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__status--savoury {
-    text-align: right;
+    text-align: center;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__status-text {
@@ -274,11 +313,12 @@
   }
 
   #shopify-section-{{ section.id }} .battle-hero__scoreboard {
+    grid-area: scoreboard;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 2.4fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 2.2fr) minmax(0, 1fr);
     align-items: center;
-    gap: 16px;
-    margin-top: 12px;
+    gap: 14px;
+    margin-top: 6px;
     transition: opacity 250ms ease, transform 250ms ease;
   }
 
@@ -286,24 +326,24 @@
     display: grid;
     gap: 4px;
     justify-items: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     min-width: 120px;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__percent-value {
-    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-size: clamp(1.2rem, 2.8vw, 2rem);
     font-weight: 700;
   }
 
   #shopify-section-{{ section.id }} .battle-hero__bar-frame {
     display: grid;
     gap: 8px;
-    padding: 10px;
+    padding: 8px;
     border-radius: 14px;
     border: 1px solid var(--battle-bar-border);
     background: var(--battle-panel);
     justify-self: center;
-    width: min(520px, 100%);
+    width: min(480px, 100%);
   }
 
   #shopify-section-{{ section.id }} .battle-hero__bar-header {
@@ -314,7 +354,7 @@
 
   #shopify-section-{{ section.id }} .battle-hero__bar {
     position: relative;
-    height: 56px;
+    height: 52px;
     border-radius: 8px;
     background: var(--battle-savoury-bar);
     border: 2px solid var(--battle-bar-border);
@@ -368,11 +408,12 @@
   }
 
   #shopify-section-{{ section.id }} .battle-hero__cta-row {
+    grid-area: cta;
     display: flex;
     justify-content: center;
-    gap: 16px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 8px;
     transition: opacity 250ms ease, transform 250ms ease;
   }
 
@@ -465,11 +506,24 @@
 
     #shopify-section-{{ section.id }} .battle-hero__overlay-inner {
       gap: 10px;
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "eyebrow"
+        "title"
+        "tagline"
+        "loading"
+        "leader"
+        "status"
+        "scoreboard"
+        "cta";
+      justify-items: center;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__eyebrow {
       font-size: 0.65rem;
       letter-spacing: 0.16em;
+      justify-self: center;
+      padding: 5px 10px;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__title {
@@ -479,6 +533,8 @@
     #shopify-section-{{ section.id }} .battle-hero__tagline {
       font-size: 0.8rem;
       letter-spacing: 0.1em;
+      justify-self: center;
+      padding: 5px 10px;
     }
 
     #shopify-section-{{ section.id }} .battle-hero__leader {
