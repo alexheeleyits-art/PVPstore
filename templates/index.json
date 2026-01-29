@@ -11,6 +11,7 @@
   "sections": {
     "battle_announcement": {
       "type": "battle-announcement",
+      "disabled": true,
       "settings": {
         "label": "Rotating alert ticker",
         "endpoint": "/battle-state.json",
