@@ -19,7 +19,7 @@
         "endpoint": "/battle-state.json",
         "poll_min": 12,
         "poll_max": 24,
-        "color_scheme": ""
+        "color_scheme": "scheme-4"
       }
     },
     "header_section": {
