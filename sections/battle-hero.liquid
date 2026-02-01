@@ -117,6 +117,7 @@
     --battle-bar-border: #c7b39d;
     --battle-panel: #f8efe3;
     --battle-hero-height: clamp(560px, 82svh, 760px);
+    --battle-top-offset: calc(var(--header-group-height, var(--header-height, 0px)) + var(--battle-announcement-height, 0px));
 
     position: relative;
     overflow: hidden;
@@ -195,6 +196,7 @@
     display: grid;
     place-items: center;
     padding: clamp(20px, 3vw, 40px);
+    padding-top: calc(var(--battle-top-offset) + clamp(16px, 2vw, 28px));
     text-align: center;
     pointer-events: none;
   }
@@ -524,6 +526,7 @@
 
     #shopify-section-{{ section.id }} .battle-hero__overlay {
       padding: 28px 16px 32px;
+      padding-top: calc(var(--battle-top-offset) + 20px);
     }
 
     #shopify-section-{{ section.id }} .battle-hero__overlay-inner {
