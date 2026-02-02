@@ -39,9 +39,12 @@
           }
         }
       },
-      "block_order": ["team-1", "team-2"],
+      "block_order": [
+        "team-1",
+        "team-2"
+      ],
       "settings": {
-        "endpoint": "/battle-state.json",
+        "endpoint": "https://pvpshop.vercel.app/battle-state.json",
         "poll_min": 12,
         "poll_max": 24
       }
@@ -99,7 +102,11 @@
           }
         }
       },
-      "block_order": ["step-1", "step-2", "step-3"],
+      "block_order": [
+        "step-1",
+        "step-2",
+        "step-3"
+      ],
       "settings": {
         "title": "How the battle works",
         "subtitle": "Join a team, shop your favourites, and push your side to victory."
