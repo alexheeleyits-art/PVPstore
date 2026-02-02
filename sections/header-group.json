@@ -18,7 +18,7 @@
         "savoury_label": "Savoury",
         "cta_text": "Join now",
         "cta_link": "",
-        "end_date": "2026-028-01T00:00:00Z",
+        "end_date": "2026-02-28T00:00:00Z",
         "endpoint": "https://pvpshop.vercel.app/battle-state.json",
         "poll_min": 12,
         "poll_max": 24
