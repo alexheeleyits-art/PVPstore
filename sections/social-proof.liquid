@@ -1,0 +1,115 @@
+<section class="social-proof">
+  <div class="social-proof__container">
+    <div class="social-proof__grid">
+      <div class="social-proof__item">
+        <div class="social-proof__value">{{ section.settings.stat_1_value }}</div>
+        <div class="social-proof__label">
+          {% render 'icon-trending-up' %}
+          {{ section.settings.stat_1_label }}
+        </div>
+      </div>
+
+      <div class="social-proof__item">
+        <div class="social-proof__value">
+          {{ section.settings.stat_2_value }}
+          {% render 'icon-star' %}
+        </div>
+        <div class="social-proof__label">{{ section.settings.stat_2_label }}</div>
+      </div>
+
+      <div class="social-proof__item">
+        <div class="social-proof__value">{{ section.settings.stat_3_value }}</div>
+        <div class="social-proof__label">
+          {% render 'icon-users' %}
+          {{ section.settings.stat_3_label }}
+        </div>
+      </div>
+
+      <div class="social-proof__item">
+        <div class="social-proof__value social-proof__value--accent">{{ section.settings.stat_4_value }}</div>
+        <div class="social-proof__label">{{ section.settings.stat_4_label }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .social-proof {
+    background: #f9fafb;
+    padding: 48px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    text-align: center;
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__item {
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__value {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800;
+    color: #111827;
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__value--accent {
+    color: transparent;
+    background: linear-gradient(90deg, #f59e0b, #f97316);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b7280;
+  }
+
+  #shopify-section-{{ section.id }} .social-proof__label svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} .social-proof__grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Social Proof Stats",
+  "settings": [
+    { "type": "text", "id": "stat_1_value", "label": "Stat 1 Value", "default": "1,247+" },
+    { "type": "text", "id": "stat_1_label", "label": "Stat 1 Label", "default": "Items Sold" },
+    { "type": "text", "id": "stat_2_value", "label": "Stat 2 Value", "default": "4.9" },
+    { "type": "text", "id": "stat_2_label", "label": "Stat 2 Label", "default": "Average Rating" },
+    { "type": "text", "id": "stat_3_value", "label": "Stat 3 Value", "default": "247" },
+    { "type": "text", "id": "stat_3_label", "label": "Stat 3 Label", "default": "Live Shoppers" },
+    { "type": "text", "id": "stat_4_value", "label": "Stat 4 Value", "default": "20% OFF" },
+    { "type": "text", "id": "stat_4_label", "label": "Stat 4 Label", "default": "For Winning Team" }
+  ],
+  "presets": [
+    {
+      "name": "Social Proof Stats"
+    }
+  ]
+}
+{% endschema %}

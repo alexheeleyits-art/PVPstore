@@ -1,0 +1,175 @@
+<section class="live-status" data-section-id="{{ section.id }}">
+  <div class="live-status__container">
+    <div class="live-status__left">
+      <div class="live-status__live">
+        <span class="live-status__ping" aria-hidden="true"></span>
+        <span class="live-status__label">{{ section.settings.live_text }}</span>
+      </div>
+
+      <div class="live-status__metric">
+        {% render 'icon-users' %}
+        <span class="live-status__number" data-live-shoppers>247</span>
+        <span class="live-status__text">active shoppers</span>
+      </div>
+
+      <div class="live-status__metric live-status__metric--secondary">
+        {% render 'icon-shopping-bag' %}
+        <span class="live-status__number" data-items-sold>1,247+</span>
+        <span class="live-status__text">items sold</span>
+      </div>
+    </div>
+
+    <div class="live-status__promo">
+      {% render 'icon-trophy' %}
+      {{ section.settings.promo_text }}
+    </div>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .live-status {
+    background: #0b0b0b;
+    color: #ffffff;
+    padding: 10px 0;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 0.75rem;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__ping {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+    animation: livePing 1.5s ease-in-out infinite;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__metric {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #d1d5db;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__metric svg,
+  #shopify-section-{{ section.id }} .live-status__promo svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__metric--secondary {
+    display: none;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__number {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  #shopify-section-{{ section.id }} .live-status__promo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ca8a04, #facc15);
+    color: #111111;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 0 15px rgba(250, 204, 21, 0.45);
+  }
+
+  @keyframes livePing {
+    0% {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} .live-status__metric--secondary {
+      display: inline-flex;
+    }
+  }
+{% endstyle %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('shopify-section-{{ section.id }}');
+    if (!root) return;
+    const shoppersEl = root.querySelector('[data-live-shoppers]');
+    const itemsEl = root.querySelector('[data-items-sold]');
+
+    let shoppers = 247;
+    let items = 1247;
+
+    setInterval(() => {
+      shoppers = Math.max(200, shoppers + Math.floor(Math.random() * 5) - 2);
+      if (shoppersEl) shoppersEl.textContent = shoppers;
+
+      if (Math.random() > 0.7) {
+        items += 1;
+        if (itemsEl) itemsEl.textContent = `${items}+`;
+      }
+    }, 1500);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Live Status Bar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "live_text",
+      "label": "Live Indicator Text",
+      "default": "Live Status"
+    },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "Promo Badge Text",
+      "default": "Winner gets 20% off"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Live Status Bar"
+    }
+  ]
+}
+{% endschema %}

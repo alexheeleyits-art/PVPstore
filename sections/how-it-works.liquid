@@ -1,0 +1,166 @@
+<section class="how-it-works" data-section-id="{{ section.id }}">
+  <div class="how-it-works__container">
+    <div class="how-it-works__header">
+      <h2 class="how-it-works__title">{{ section.settings.title }}</h2>
+      <p class="how-it-works__subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+
+    <div class="how-it-works__steps">
+      <div class="how-it-works__line" aria-hidden="true"></div>
+      {% for block in section.blocks %}
+        <div class="how-it-works__step" {{ block.shopify_attributes }}>
+          <div class="how-it-works__circle how-it-works__circle--{{ forloop.index }}">
+            {{ forloop.index }}
+            <span class="how-it-works__circle-ring"></span>
+          </div>
+          <h3 class="how-it-works__step-title">{{ block.settings.title }}</h3>
+          <p class="how-it-works__step-text">{{ block.settings.description }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .how-it-works {
+    padding: 80px 0;
+    background: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 48px;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__title {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__subtitle {
+    color: #6b7280;
+    font-size: 1rem;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__line {
+    position: absolute;
+    top: 46px;
+    left: 16%;
+    right: 16%;
+    height: 2px;
+    background: #f3f4f6;
+    z-index: 0;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__step {
+    text-align: center;
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__circle {
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 2px solid #f3f4f6;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #d1d5db;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__circle-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    border-bottom: 4px solid #e5e7eb;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__circle--2 {
+    border-color: #fce7f3;
+    color: #f9a8d4;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__circle--2 .how-it-works__circle-ring {
+    border-bottom-color: #fbcfe8;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__circle--3 {
+    border-color: #fef3c7;
+    color: #fcd34d;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__circle--3 .how-it-works__circle-ring {
+    border-bottom-color: #fde68a;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__step-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  #shopify-section-{{ section.id }} .how-it-works__step-text {
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.6;
+  }
+
+  @media screen and (max-width: 989px) {
+    #shopify-section-{{ section.id }} .how-it-works__steps {
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{ section.id }} .how-it-works__line {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "How It Works",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "How the battle works" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Join a team and help them win the battle." }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Step Title" },
+        { "type": "textarea", "id": "description", "label": "Step Description" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "How It Works"
+    }
+  ]
+}
+{% endschema %}

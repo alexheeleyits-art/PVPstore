@@ -1,0 +1,352 @@
+<section
+  class="hero-battle"
+  data-battle-hero
+  data-endpoint="{{ section.settings.endpoint | escape }}"
+  data-poll-min="{{ section.settings.poll_min | times: 1000 }}"
+  data-poll-max="{{ section.settings.poll_max | times: 1000 }}"
+>
+  <div class="hero-battle__grid">
+    {% for block in section.blocks %}
+      <article
+        class="hero-battle__card hero-battle__card--{{ block.settings.team_color }}"
+        data-battle-team="{{ block.settings.team_color }}"
+        {{ block.shopify_attributes }}
+      >
+        <div class="hero-battle__media">
+          {% if block.settings.image %}
+            {{
+              block.settings.image
+              | image_url: width: 1200
+              | image_tag: class: 'hero-battle__image', loading: 'lazy', alt: block.settings.title
+            }}
+          {% else %}
+            {{ 'lifestyle-1' | placeholder_svg_tag: 'hero-battle__image' }}
+          {% endif %}
+        </div>
+
+        <div class="hero-battle__content">
+          <span class="hero-battle__badge" data-battle-badge="{{ block.settings.team_color }}">
+            {{ block.settings.badge_text }}
+          </span>
+
+          <h2 class="hero-battle__title">{{ block.settings.title | newline_to_br }}</h2>
+          <p class="hero-battle__description">{{ block.settings.description }}</p>
+
+          <div class="hero-battle__meta">
+            <span class="hero-battle__meta-item">
+              {% render 'icon-users' %}
+              {{ block.settings.member_count }}
+            </span>
+            <span class="hero-battle__meta-item">
+              {% render 'icon-box' %}
+              {{ block.settings.product_count }}
+            </span>
+          </div>
+
+          <a class="hero-battle__cta" href="{{ block.settings.link | default: '#' }}">
+            {{ block.settings.cta_text }}
+            {% render 'icon-arrow-right' %}
+          </a>
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .hero-battle {
+    background: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 600px;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card {
+    position: relative;
+    overflow: hidden;
+    height: 600px;
+    color: #ffffff;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card::before,
+  #shopify-section-{{ section.id }} .hero-battle__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card--sweet::before {
+    background: linear-gradient(to top, rgba(136, 19, 55, 0.9), rgba(136, 19, 55, 0.4), transparent);
+    mix-blend-mode: multiply;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card--sweet::after {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.25));
+    mix-blend-mode: overlay;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card--savoury::before {
+    background: linear-gradient(to top, rgba(120, 53, 15, 0.9), rgba(120, 53, 15, 0.4), transparent);
+    mix-blend-mode: multiply;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card--savoury::after {
+    background: linear-gradient(225deg, rgba(249, 115, 22, 0.25), rgba(250, 204, 21, 0.25));
+    mix-blend-mode: overlay;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__media {
+    position: absolute;
+    inset: 0;
+    background: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transform: scale(1);
+    transition: transform 700ms ease, opacity 700ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card:hover .hero-battle__image {
+    transform: scale(1.08);
+    opacity: 0.9;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__content {
+    position: relative;
+    padding: 32px 32px 40px;
+    max-width: 420px;
+    display: grid;
+    gap: 16px;
+    z-index: 2;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(17, 17, 17, 0.65);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card--sweet .hero-battle__badge {
+    background: #ec4899;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__title {
+    font-size: clamp(2.2rem, 3.5vw, 3.6rem);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__description {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__meta-item svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    border-radius: 999px;
+    background: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: #7f1d1d;
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.25);
+    transition: background 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__cta svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card--savoury .hero-battle__cta {
+    color: #92400e;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__cta:hover {
+    background: #f8fafc;
+  }
+
+  #shopify-section-{{ section.id }} .hero-battle__card.is-leading .hero-battle__badge {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), 0 16px 30px rgba(0, 0, 0, 0.35);
+  }
+
+  @media screen and (max-width: 989px) {
+    #shopify-section-{{ section.id }} .hero-battle__grid {
+      grid-template-columns: 1fr;
+    }
+
+    #shopify-section-{{ section.id }} .hero-battle__card {
+      height: 520px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .hero-battle__content {
+      padding: 28px;
+      max-width: 100%;
+    }
+
+    #shopify-section-{{ section.id }} .hero-battle__title {
+      font-size: clamp(1.9rem, 7vw, 2.6rem);
+    }
+
+    #shopify-section-{{ section.id }} .hero-battle__meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+{% endstyle %}
+
+<script src="{{ 'newdesign-battle.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Battle Hero",
+  "max_blocks": 2,
+  "settings": [
+    {
+      "type": "text",
+      "id": "endpoint",
+      "label": "Battle state endpoint",
+      "default": "/battle-state.json"
+    },
+    {
+      "type": "range",
+      "id": "poll_min",
+      "label": "Poll minimum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "poll_max",
+      "label": "Poll maximum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 24
+    }
+  ],
+  "blocks": [
+    {
+      "type": "team",
+      "name": "Team Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background Image"
+        },
+        {
+          "type": "select",
+          "id": "team_color",
+          "label": "Theme Color",
+          "options": [
+            { "value": "sweet", "label": "Sweet (Pink)" },
+            { "value": "savoury", "label": "Savoury (Amber)" }
+          ],
+          "default": "sweet"
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge Text",
+          "default": "Winning - 54%"
+        },
+        {
+          "type": "textarea",
+          "id": "title",
+          "label": "Title",
+          "default": "Team\nSweet"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Description",
+          "default": "Decadent chocolates..."
+        },
+        {
+          "type": "text",
+          "id": "member_count",
+          "label": "Member Count",
+          "default": "2.4k Members"
+        },
+        {
+          "type": "text",
+          "id": "product_count",
+          "label": "Product Count",
+          "default": "24 Products"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Button Text",
+          "default": "Join Team"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle Hero",
+      "blocks": [
+        { "type": "team" },
+        { "type": "team" }
+      ]
+    }
+  ]
+}
+{% endschema %}

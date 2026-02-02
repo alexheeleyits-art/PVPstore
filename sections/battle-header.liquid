@@ -1,0 +1,307 @@
+<header class="battle-header">
+  <div class="battle-header__container">
+    <div class="battle-header__inner">
+      <a href="{{ routes.root_url }}" class="battle-header__logo">
+        <span class="battle-header__logo-badge">VS</span>
+        <span class="battle-header__logo-text">
+          <span class="battle-header__logo-title">SWEET</span>
+          <span class="battle-header__logo-subtitle">SAVOURY</span>
+        </span>
+      </a>
+
+      <nav class="battle-header__nav">
+        {% for block in section.blocks %}
+          <div class="battle-header__item">
+            <a class="battle-header__link" href="{{ block.settings.url | default: '#' }}">
+              {{ block.settings.title }}
+              {% if block.settings.menu != blank %}
+                {% render 'icon-chevron-down' %}
+              {% endif %}
+            </a>
+
+            {% if block.settings.menu != blank %}
+              <div class="battle-header__mega">
+                <div class="battle-header__mega-grid">
+                  {% for link in linklists[block.settings.menu].links %}
+                    <div class="battle-header__mega-col">
+                      <h4 class="battle-header__mega-title">{{ link.title }}</h4>
+                      <ul class="battle-header__mega-list">
+                        {% for childlink in link.links %}
+                          <li>
+                            <a class="battle-header__mega-link" href="{{ childlink.url }}">{{ childlink.title }}</a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </nav>
+
+      <div class="battle-header__icons">
+        <a href="{{ routes.search_url }}" class="battle-header__icon" aria-label="Search">
+          {% render 'icon-search' %}
+        </a>
+        <a href="{{ routes.account_url }}" class="battle-header__icon battle-header__icon--account" aria-label="Account">
+          {% render 'icon-user' %}
+        </a>
+        <a href="{{ routes.cart_url }}" class="battle-header__icon battle-header__icon--cart" aria-label="Cart">
+          {% render 'icon-cart' %}
+          <span class="battle-header__cart-count">{{ cart.item_count }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% style %}
+  body {
+    --header-height: 80px;
+    --header-group-height: calc(var(--header-height) + var(--battle-announcement-height, 0px));
+  }
+
+  #shopify-section-{{ section.id }} .battle-header {
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    position: relative;
+    z-index: var(--layer-heightened);
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    gap: 24px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__logo-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #111111;
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__logo-title {
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__logo-subtitle {
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: #9ca3af;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__nav {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    height: 100%;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__item {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6b7280;
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__link svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__link:hover {
+    color: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__mega {
+    position: absolute;
+    top: calc(100% - 4px);
+    left: 50%;
+    transform: translateX(-25%);
+    width: 800px;
+    background: #ffffff;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 200ms ease, transform 200ms ease;
+    z-index: 40;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__item:hover .battle-header__mega {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-25%) translateY(6px);
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__mega-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__mega-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__mega-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__mega-link {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-decoration: none;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__mega-link:hover {
+    color: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__icons {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    color: #6b7280;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__icon:hover {
+    color: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .battle-header__cart-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: #111111;
+    color: #ffffff;
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+  }
+
+  @media screen and (max-width: 989px) {
+    body {
+      --header-height: 72px;
+    }
+
+    #shopify-section-{{ section.id }} .battle-header__nav {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .battle-header__icon--account {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+{% schema %}
+{
+  "name": "Battle Header",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "menu_item",
+      "name": "Menu Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Link Title",
+          "default": "Shop"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Link URL"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Mega Menu"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle Header"
+    }
+  ]
+}
+{% endschema %}

@@ -9,173 +9,108 @@
  */
 {
   "sections": {
-    "battle_announcement": {
-      "type": "battle-announcement",
-      "disabled": true,
-      "settings": {
-        "label": "Rotating alert ticker",
-        "endpoint": "/battle-state.json",
-        "poll_min": 12,
-        "poll_max": 24,
-        "color_scheme": "scheme-1"
-      }
-    },
-    "battle_hero": {
-      "type": "battle-hero",
-      "settings": {
-        "heading": "Sweet vs Savoury",
-        "subheading": "Battle for the win",
-        "eyebrow": "60 days - Battle for the win",
-        "sweet_label": "Team Sweet",
-        "savoury_label": "Team Savoury",
-        "sweet_button_label": "Shop Sweet Side",
-        "savoury_button_label": "Shop Savoury Side",
-        "sweet_link": "",
-        "savoury_link": "",
-        "end_date": "2026-02-01T00:00:00Z",
-        "endpoint": "https://pvpshop.vercel.app/battle-state.json",
-        "poll_min": 12,
-        "poll_max": 24,
-        "color_scheme": "scheme-1"
-      }
-    },
-    "battle_collections": {
-      "type": "battle-collections",
+    "hero_battle": {
+      "type": "hero-battle",
       "blocks": {
-        "highlight-1": {
-          "type": "highlight",
+        "team-1": {
+          "type": "team",
           "settings": {
-            "heading": "Best Seller Item",
+            "team_color": "sweet",
+            "badge_text": "Winning - 54%",
+            "title": "Team\\nSweet",
+            "description": "Decadent chocolates...",
+            "member_count": "2.4k Members",
+            "product_count": "24 Products",
+            "cta_text": "Join Team",
             "link": ""
-          },
-          "blocks": {}
+          }
         },
-        "highlight-2": {
-          "type": "highlight",
+        "team-2": {
+          "type": "team",
           "settings": {
-            "heading": "Limited Edition Drop",
+            "team_color": "savoury",
+            "badge_text": "Closing gap - 46%",
+            "title": "Team\\nSavoury",
+            "description": "Crisp bites and bold flavours...",
+            "member_count": "2.1k Members",
+            "product_count": "18 Products",
+            "cta_text": "Join Team",
             "link": ""
-          },
-          "blocks": {}
-        },
-        "highlight-3": {
-          "type": "highlight",
-          "settings": {
-            "heading": "Clutch Item +3 Votes",
-            "link": ""
-          },
-          "blocks": {}
-        },
-        "battle-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 4,
-            "inherit_color_scheme": true,
-            "color_scheme": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product-card-gallery": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "color": "var(--color-foreground)",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product-card-gallery",
-            "product_title",
-            "price"
-          ]
+          }
         }
       },
-      "block_order": [
-        "highlight-1",
-        "highlight-2",
-        "highlight-3"
-      ],
+      "block_order": ["team-1", "team-2"],
       "settings": {
-        "products_heading": "Featured items",
-        "sweet_products_heading": "Top Sweet Picks",
-        "savoury_products_heading": "Top Savoury Picks",
-        "sweet_link_label": "Shop Sweet Side",
-        "savoury_link_label": "Shop Savoury Side",
-        "collection_list": [],
-        "max_products": 4,
-        "color_scheme": "scheme-1"
+        "endpoint": "/battle-state.json",
+        "poll_min": 12,
+        "poll_max": 24
+      }
+    },
+    "live_status": {
+      "type": "live-status",
+      "settings": {
+        "live_text": "Live Status",
+        "promo_text": "Winner gets 20% off"
+      }
+    },
+    "social_proof": {
+      "type": "social-proof",
+      "settings": {
+        "stat_1_value": "1,247+",
+        "stat_1_label": "Items Sold",
+        "stat_2_value": "4.9",
+        "stat_2_label": "Average Rating",
+        "stat_3_value": "247",
+        "stat_3_label": "Live Shoppers",
+        "stat_4_value": "20% OFF",
+        "stat_4_label": "For Winning Team"
+      }
+    },
+    "live_feed": {
+      "type": "live-feed",
+      "settings": {
+        "title": "Live Purchase Feed",
+        "sweet_items": "Dark Choco Box,Macaron Set,Strawberry Tart",
+        "savoury_items": "Spicy Chips,Cheese Puffs,Pretzel Mix"
+      }
+    },
+    "how_it_works": {
+      "type": "how-it-works",
+      "blocks": {
+        "step-1": {
+          "type": "step",
+          "settings": {
+            "title": "Pick a side",
+            "description": "Choose Team Sweet or Team Savoury to back."
+          }
+        },
+        "step-2": {
+          "type": "step",
+          "settings": {
+            "title": "Shop your favourites",
+            "description": "Every purchase powers your team."
+          }
+        },
+        "step-3": {
+          "type": "step",
+          "settings": {
+            "title": "Watch the leaderboard",
+            "description": "Live totals update as orders come in."
+          }
+        }
+      },
+      "block_order": ["step-1", "step-2", "step-3"],
+      "settings": {
+        "title": "How the battle works",
+        "subtitle": "Join a team, shop your favourites, and push your side to victory."
       }
     }
   },
   "order": [
-    "battle_announcement",
-    "battle_hero",
-    "battle_collections"
+    "hero_battle",
+    "live_status",
+    "social_proof",
+    "live_feed",
+    "how_it_works"
   ]
 }

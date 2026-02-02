@@ -1,0 +1,136 @@
+<section class="w-full grid grid-cols-1 md:grid-cols-2 min-h-[600px]">
+  
+  {% for block in section.blocks %}
+  <div class="relative group overflow-hidden h-[500px] md:h-[600px]">
+    <div class="absolute inset-0 bg-gray-900">
+        {% if block.settings.image %}
+          <img 
+            src="{{ block.settings.image | image_url: width: 1000 }}" 
+            alt="{{ block.settings.title }}" 
+            class="w-full h-full object-cover opacity-80 group-hover:scale-110 group-hover:opacity-90 transition-all duration-700"
+          >
+        {% else %}
+           {{ 'lifestyle-1' | placeholder_svg_tag: 'w-full h-full object-cover opacity-80' }}
+        {% endif %}
+    </div>
+    
+    <!-- Gradient Overlays based on side -->
+    {% if block.settings.team_color == 'sweet' %}
+       <div class="absolute inset-0 bg-gradient-to-t from-rose-900/90 via-rose-800/40 to-transparent mix-blend-multiply pointer-events-none"></div>
+       <div class="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 mix-blend-overlay pointer-events-none"></div>
+    {% else %}
+       <div class="absolute inset-0 bg-gradient-to-t from-amber-900/90 via-amber-800/40 to-transparent mix-blend-multiply pointer-events-none"></div>
+       <div class="absolute inset-0 bg-gradient-to-bl from-orange-500/20 to-yellow-500/20 mix-blend-overlay pointer-events-none"></div>
+    {% endif %}
+    
+    <div class="absolute bottom-0 left-0 w-full p-8 md:p-12 text-white">
+      <div class="mb-4 flex items-center gap-2">
+        <span class="{% if block.settings.team_color == 'sweet' %}bg-pink-600 shadow-pink-900/50{% else %}bg-gray-800 backdrop-blur-sm{% endif %} text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+            {{ block.settings.badge_text }}
+        </span>
+      </div>
+      
+      <h2 class="text-5xl md:text-6xl font-black uppercase mb-4 tracking-tighter drop-shadow-xl">
+        {{ block.settings.title | newline_to_br }}
+      </h2>
+      <p class="{% if block.settings.team_color == 'sweet' %}text-pink-100{% else %}text-amber-100{% endif %} max-w-sm mb-8 text-lg font-medium drop-shadow-md">
+        {{ block.settings.description }}
+      </p>
+
+      <div class="flex gap-6 mb-8 text-sm font-semibold {% if block.settings.team_color == 'sweet' %}text-pink-50{% else %}text-amber-50{% endif %}">
+        <div class="flex items-center gap-2">
+            {% render 'icon-users' %} {{ block.settings.member_count }}
+        </div>
+        <div class="flex items-center gap-2">
+            {% render 'icon-box' %} {{ block.settings.product_count }}
+        </div>
+      </div>
+
+      <a href="{{ block.settings.link }}" class="bg-white {% if block.settings.team_color == 'sweet' %}text-rose-900 hover:bg-rose-50{% else %}text-amber-900 hover:bg-amber-50{% endif %} px-8 py-4 rounded-full font-black text-xl flex items-center gap-3 transition-colors shadow-xl inline-flex text-decoration-none">
+        {{ block.settings.cta_text }} {% render 'icon-arrow-right' %}
+      </a>
+    </div>
+  </div>
+  {% endfor %}
+
+</section>
+
+{% schema %}
+{
+  "name": "Battle Hero",
+  "max_blocks": 2,
+  "blocks": [
+    {
+      "type": "team",
+      "name": "Team Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background Image"
+        },
+        {
+          "type": "select",
+          "id": "team_color",
+          "label": "Theme Color",
+          "options": [
+             { "value": "sweet", "label": "Sweet (Pink)" },
+             { "value": "savoury", "label": "Savoury (Amber)" }
+          ],
+          "default": "sweet"
+        },
+        {
+          "type": "text",
+          "id": "badge_text",
+          "label": "Badge Text",
+          "default": "Winning • 54%"
+        },
+        {
+           "type": "textarea",
+           "id": "title",
+           "label": "Title",
+           "default": "Team\nSweet"
+        },
+        {
+           "type": "textarea",
+           "id": "description",
+           "label": "Description",
+           "default": "Decadent chocolates..."
+        },
+        {
+          "type": "text",
+          "id": "member_count",
+          "label": "Member Count",
+          "default": "2.4k Members"
+        },
+        {
+          "type": "text",
+          "id": "product_count",
+          "label": "Product Count",
+          "default": "24 Products"
+        },
+        {
+           "type": "text",
+           "id": "cta_text",
+           "label": "Button Text",
+           "default": "JOIN TEAM"
+        },
+        {
+           "type": "url",
+           "id": "link",
+           "label": "Button Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle Hero",
+      "blocks": [
+        { "type": "team" },
+        { "type": "team" }
+      ]
+    }
+  ]
+}
+{% endschema %}

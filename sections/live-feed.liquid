@@ -1,0 +1,186 @@
+<section class="live-feed" data-section-id="{{ section.id }}">
+  <div class="live-feed__container">
+    <h3 class="live-feed__title">{{ section.settings.title }}</h3>
+    <div class="live-feed__grid" data-live-feed></div>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .live-feed {
+    background: #ffffff;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 14px;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border-left: 4px solid #e5e7eb;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__icon--sweet {
+    background: #fce7f3;
+    color: #db2777;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__icon--savoury {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__text {
+    display: grid;
+    gap: 2px;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__headline {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__headline span {
+    font-weight: 700;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__headline .live-feed__sweet {
+    color: #db2777;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__headline .live-feed__savoury {
+    color: #d97706;
+  }
+
+  #shopify-section-{{ section.id }} .live-feed__time {
+    font-size: 0.7rem;
+    color: #9ca3af;
+  }
+
+  @media screen and (min-width: 750px) {
+    #shopify-section-{{ section.id }} .live-feed__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+{% endstyle %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('shopify-section-{{ section.id }}');
+    if (!root) return;
+    const container = root.querySelector('[data-live-feed]');
+    const sweetItems = {{ section.settings.sweet_items | split: ',' | json }};
+    const savouryItems = {{ section.settings.savoury_items | split: ',' | json }};
+    const names = ['Alex', 'Sarah', 'Mike', 'Jessica', 'David', 'Emma', 'Tom', 'Lisa'];
+
+    const createItem = () => {
+      const isSweet = Math.random() > 0.45;
+      const item = isSweet
+        ? sweetItems[Math.floor(Math.random() * sweetItems.length)]
+        : savouryItems[Math.floor(Math.random() * savouryItems.length)];
+      const name = names[Math.floor(Math.random() * names.length)];
+
+      const card = document.createElement('div');
+      card.className = 'live-feed__item';
+      card.innerHTML = `
+        <div class="live-feed__icon ${isSweet ? 'live-feed__icon--sweet' : 'live-feed__icon--savoury'}">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 9h12l-1 12H7L6 9z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 9V7a3 3 0 0 1 6 0v2"></path>
+          </svg>
+        </div>
+        <div class="live-feed__text">
+          <div class="live-feed__headline">
+            ${name} bought <span class="${isSweet ? 'live-feed__sweet' : 'live-feed__savoury'}">${item}</span>
+          </div>
+          <div class="live-feed__time">Just now</div>
+        </div>
+      `;
+
+      if (container.children.length >= 3) {
+        container.removeChild(container.lastElementChild);
+      }
+      container.prepend(card);
+      requestAnimationFrame(() => {
+        card.classList.add('is-visible');
+      });
+    };
+
+    createItem();
+    createItem();
+    createItem();
+    setInterval(createItem, 4000);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Live Purchase Feed",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Live Purchase Feed"
+    },
+    {
+      "type": "textarea",
+      "id": "sweet_items",
+      "label": "Sweet Items (Comma Separated)",
+      "default": "Dark Choco Box,Macaron Set,Strawberry Tart"
+    },
+    {
+      "type": "textarea",
+      "id": "savoury_items",
+      "label": "Savoury Items (Comma Separated)",
+      "default": "Spicy Chips,Cheese Puffs,Pretzel Mix"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Live Purchase Feed"
+    }
+  ]
+}
+{% endschema %}

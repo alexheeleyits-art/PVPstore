@@ -1,0 +1,346 @@
+<section
+  class="battle-bar"
+  data-battle-bar
+  data-endpoint="{{ section.settings.endpoint | escape }}"
+  data-poll-min="{{ section.settings.poll_min | times: 1000 }}"
+  data-poll-max="{{ section.settings.poll_max | times: 1000 }}"
+  data-end-date="{{ section.settings.end_date | escape }}"
+>
+  <div class="battle-bar__container">
+    <div class="battle-bar__row">
+      <div class="battle-bar__status">
+        <div class="battle-bar__live">
+          <span class="battle-bar__pulse" aria-hidden="true"></span>
+          LIVE BATTLE
+        </div>
+        <div class="battle-bar__timer" data-battle-timer>Loading...</div>
+      </div>
+
+      <div class="battle-bar__progress">
+        <div class="battle-bar__label battle-bar__label--sweet">
+          <span class="battle-bar__team">{{ section.settings.sweet_label }}</span>
+          <span class="battle-bar__state" data-battle-sweet-status>Leading</span>
+        </div>
+
+        <div class="battle-bar__track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+          <span class="battle-bar__fill battle-bar__fill--sweet" data-battle-sweet-bar></span>
+          <span class="battle-bar__fill battle-bar__fill--savoury" data-battle-savoury-bar></span>
+          <span class="battle-bar__percent battle-bar__percent--sweet" data-battle-sweet-percent>50%</span>
+          <span class="battle-bar__percent battle-bar__percent--savoury" data-battle-savoury-percent>50%</span>
+        </div>
+
+        <div class="battle-bar__label battle-bar__label--savoury">
+          <span class="battle-bar__team">{{ section.settings.savoury_label }}</span>
+          <span class="battle-bar__state" data-battle-savoury-status>Trailing</span>
+        </div>
+      </div>
+
+      <div class="battle-bar__cta">
+        <a class="battle-bar__cta-button" href="{{ section.settings.cta_link | default: '#' }}">
+          {{ section.settings.cta_text }}
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .battle-bar {
+    position: sticky;
+    top: 0;
+    z-index: var(--layer-sticky);
+    background: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 12px 16px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 auto;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__live {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dc2626;
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
+    animation: battlePulse 1.4s ease-in-out infinite;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__timer {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #f3f4f6;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 2 1 420px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__label {
+    display: grid;
+    gap: 4px;
+    width: 92px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__label--sweet {
+    text-align: right;
+    color: #db2777;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__label--savoury {
+    text-align: left;
+    color: #d97706;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__state {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.08em;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__track {
+    position: relative;
+    flex: 1;
+    height: 24px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    transition: width 900ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__fill--sweet {
+    left: 0;
+    background: linear-gradient(90deg, #f472b6, #f43f5e);
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__fill--savoury {
+    right: 0;
+    background: linear-gradient(270deg, #f59e0b, #f97316);
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__percent {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__percent--sweet {
+    left: 10px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__percent--savoury {
+    right: 10px;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__cta {
+    display: flex;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: #111111;
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: background 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .battle-bar__cta-button:hover {
+    background: #2b2b2b;
+  }
+
+  .header-section:has(> #header-component[sticky='always']),
+  .header-section:has(> #header-component[sticky='scroll-up'][data-sticky-state='active']) {
+    top: calc(var(--battle-announcement-height, 0px) - 1px);
+  }
+
+  @keyframes battlePulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.6);
+    }
+    70% {
+      box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(220, 38, 38, 0);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .battle-bar__row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    #shopify-section-{{ section.id }} .battle-bar__status {
+      justify-content: center;
+      width: 100%;
+    }
+
+    #shopify-section-{{ section.id }} .battle-bar__progress {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    #shopify-section-{{ section.id }} .battle-bar__label {
+      width: auto;
+      text-align: center;
+    }
+
+    #shopify-section-{{ section.id }} .battle-bar__cta {
+      display: none;
+    }
+  }
+{% endstyle %}
+
+<script src="{{ 'newdesign-battle.js' | asset_url }}" defer></script>
+<script>
+  (() => {
+    const root = document.getElementById('shopify-section-{{ section.id }}');
+    const bar = root ? root.querySelector('.battle-bar') : null;
+    if (!bar) return;
+
+    const updateOffset = () => {
+      document.body.style.setProperty('--battle-announcement-height', `${bar.offsetHeight}px`);
+    };
+
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Sticky Battle Bar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "sweet_label",
+      "label": "Sweet label",
+      "default": "Sweet"
+    },
+    {
+      "type": "text",
+      "id": "savoury_label",
+      "label": "Savoury label",
+      "default": "Savoury"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Join now"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "Battle end date (ISO 8601)",
+      "default": "2026-02-01T00:00:00Z"
+    },
+    {
+      "type": "text",
+      "id": "endpoint",
+      "label": "Battle state endpoint",
+      "default": "/battle-state.json"
+    },
+    {
+      "type": "range",
+      "id": "poll_min",
+      "label": "Poll minimum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "poll_max",
+      "label": "Poll maximum (seconds)",
+      "min": 10,
+      "max": 30,
+      "step": 1,
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sticky Battle Bar"
+    }
+  ],
+  "disabled_on": {
+    "groups": ["footer"]
+  }
+}
+{% endschema %}
