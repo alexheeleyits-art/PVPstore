@@ -1,0 +1,758 @@
+{% liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign reviews_count = product.metafields.reviews.rating_count.value | default: 128
+%}
+
+<section
+  class="product-main"
+  data-product-main
+  data-money-format="{{ shop.money_format | escape }}"
+  data-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+>
+  <div class="product-main__container">
+    <nav class="product-main__breadcrumbs" aria-label="Breadcrumb">
+      <a href="{{ routes.root_url }}">Home</a>
+      <span>/</span>
+      {% if product.collections.first %}
+        <a href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
+        <span>/</span>
+      {% endif %}
+      <span class="product-main__crumb-current">{{ product.title }}</span>
+    </nav>
+
+    <div class="product-main__grid">
+      <div class="product-main__gallery">
+        <div class="product-main__media">
+          {% if product.featured_image %}
+            {{
+              product.featured_image
+              | image_url: width: 1200
+              | image_tag: class: 'product-main__media-image', loading: 'lazy', alt: product.title, data_product_main_image: true
+            }}
+          {% else %}
+            {{ 'product-1' | placeholder_svg_tag: 'product-main__media-image' }}
+          {% endif %}
+
+          {% if section.settings.show_badge %}
+            <div class="product-main__badge" style="background-color: {{ section.settings.team_color }};">
+              {{ section.settings.badge_text }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="product-main__thumbs" role="listbox">
+          {% for image in product.images %}
+            <button
+              type="button"
+              class="product-main__thumb{% if forloop.first %} is-active{% endif %}"
+              data-product-thumb
+              data-image-src="{{ image | image_url: width: 1200 }}"
+              aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+            >
+              {{ image | image_url: width: 240 | image_tag: class: 'product-main__thumb-image', alt: image.alt | escape }}
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="product-main__details">
+        <div class="product-main__rating">
+          <span class="product-main__stars">{% render 'icon-stars-5' %}</span>
+          <span class="product-main__reviews">({{ reviews_count }} Reviews)</span>
+        </div>
+
+        <h1 class="product-main__title">{{ product.title }}</h1>
+
+        <div class="product-main__pricing">
+          <span class="product-main__price" data-product-price>{{ current_variant.price | money }}</span>
+          <span
+            class="product-main__compare"
+            data-product-compare
+            {% unless current_variant.compare_at_price > current_variant.price %}hidden{% endunless %}
+          >
+            {{ current_variant.compare_at_price | money }}
+          </span>
+          <span
+            class="product-main__save"
+            data-product-save
+            {% unless current_variant.compare_at_price > current_variant.price %}hidden{% endunless %}
+          >
+            Save
+            {% if current_variant.compare_at_price > current_variant.price %}
+              {{ 100 | minus: current_variant.price | times: 100 | divided_by: current_variant.compare_at_price | round }}%
+            {% endif %}
+          </span>
+        </div>
+
+        <div class="product-main__description rte">
+          {{ product.description }}
+        </div>
+
+        {% if section.settings.show_battle_box %}
+          <div class="product-main__battle-box">
+            <div class="product-main__battle-icon">
+              {% render 'icon-star' %}
+            </div>
+            <div>
+              <h4 class="product-main__battle-title">{{ section.settings.battle_title }}</h4>
+              <p class="product-main__battle-desc">{{ section.settings.battle_desc }}</p>
+              <div class="product-main__battle-bar">
+                <span class="product-main__battle-fill"></span>
+              </div>
+              <p class="product-main__battle-impact">Team Impact: High</p>
+            </div>
+          </div>
+        {% endif %}
+
+        {% form 'product', product, class: 'product-main__form' %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-input>
+
+          <div class="product-main__options">
+            {% unless product.has_only_default_variant %}
+              {% for option in product.options_with_values %}
+                {% assign selected_value = option.selected_value | default: option.values.first %}
+                <fieldset class="product-main__option" data-option-index="{{ forloop.index0 }}">
+                  <legend class="product-main__option-label">{{ option.name }}</legend>
+                  <div class="product-main__option-values">
+                    {% for value in option.values %}
+                      <label class="product-main__option-choice">
+                        <input
+                          type="radio"
+                          name="option-{{ option.position }}"
+                          value="{{ value | escape }}"
+                          {% if value == selected_value %}checked{% endif %}
+                        >
+                        <span>{{ value }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                </fieldset>
+              {% endfor %}
+            {% endunless %}
+
+            <div class="product-main__quantity">
+              <span class="product-main__option-label">Quantity</span>
+              <div class="product-main__qty-control">
+                <button type="button" class="product-main__qty-btn" data-qty-minus aria-label="Decrease quantity">
+                  {% render 'icon-minus' %}
+                </button>
+                <input type="number" name="quantity" value="1" min="1" data-qty-input>
+                <button type="button" class="product-main__qty-btn" data-qty-plus aria-label="Increase quantity">
+                  {% render 'icon-plus' %}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-main__actions">
+            <button
+              type="submit"
+              class="product-main__add"
+              data-add-to-cart
+              data-add-text="{{ section.settings.btn_text | escape }}"
+              data-soldout-text="Sold out"
+              style="background-color: {{ section.settings.btn_color }};"
+            >
+              {{ section.settings.btn_text }}
+            </button>
+            <div class="product-main__selling-fast">
+              {% render 'icon-clock' %}
+              Selling fast: 42 sold in last hour
+            </div>
+          </div>
+        {% endform %}
+
+        <div class="product-main__trust">
+          <div class="product-main__trust-item">
+            {% render 'icon-shield' %}
+            <span>Authentic ingredients</span>
+          </div>
+          <div class="product-main__trust-item">
+            {% render 'icon-truck' %}
+            <span>Fast shipping</span>
+          </div>
+          <div class="product-main__trust-item">
+            {% render 'icon-check' %}
+            <span>Quality guarantee</span>
+          </div>
+          <div class="product-main__trust-item">
+            {% render 'icon-star' %}
+            <span>Award winning</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" data-variants-json>
+    {{ product.variants | json }}
+  </script>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }} .product-main {
+    background: #ffffff;
+    padding: 48px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  #shopify-section-{{ section.id }} .product-main__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__breadcrumbs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 20px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__breadcrumbs a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 150ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__breadcrumbs a:hover {
+    color: #111111;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__crumb-current {
+    color: #111111;
+    font-weight: 600;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #f3f4f6;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__media-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  #shopify-section-{{ section.id }} .product-main__thumbs {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 12px 2px 4px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__thumb {
+    width: 96px;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    overflow: hidden;
+    background: #f3f4f6;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 200ms ease, border-color 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__thumb.is-active {
+    border-color: #db2777;
+    opacity: 1;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__thumb-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__rating {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #facc15;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__stars svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__reviews {
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    color: #111827;
+    margin: 0;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__pricing {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #111827;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__compare {
+    font-size: 1.1rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__save {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #fee2e2;
+    color: #dc2626;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__description {
+    color: #4b5563;
+    line-height: 1.6;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-box {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #fbcfe8;
+    background: linear-gradient(135deg, #fdf2f8, #fff1f2);
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #ffffff;
+    display: grid;
+    place-items: center;
+    color: #db2777;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-title {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-desc {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    color: #6b7280;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-bar {
+    width: 100%;
+    height: 8px;
+    background: #fbcfe8;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-fill {
+    display: block;
+    width: 75%;
+    height: 100%;
+    background: #ec4899;
+    animation: battlePulse 1.4s ease-in-out infinite;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__battle-impact {
+    margin: 6px 0 0;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #db2777;
+    text-align: right;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__options {
+    display: grid;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__option-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__option-values {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__option-choice {
+    cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__option-choice input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__option-choice span {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__option-choice input:checked + span {
+    background: #111111;
+    border-color: #111111;
+    color: #ffffff;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__quantity {
+    display: grid;
+    gap: 10px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__qty-control {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__qty-control input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    font-weight: 700;
+    padding: 8px 0;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__qty-btn {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    color: #6b7280;
+    cursor: pointer;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__qty-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__actions {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__add {
+    width: 100%;
+    border: none;
+    color: #ffffff;
+    padding: 16px;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    box-shadow: 0 20px 25px -5px rgba(219, 39, 119, 0.2);
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 32px -8px rgba(219, 39, 119, 0.25);
+  }
+
+  #shopify-section-{{ section.id }} .product-main__add[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__selling-fast {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__selling-fast svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__trust {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    border-top: 1px solid #f3f4f6;
+    padding-top: 20px;
+    color: #6b7280;
+    font-size: 0.85rem;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #shopify-section-{{ section.id }} .product-main__trust-item svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  @media screen and (min-width: 990px) {
+    #shopify-section-{{ section.id }} .product-main__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 56px;
+    }
+  }
+{% endstyle %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('shopify-section-{{ section.id }}');
+    if (!root) return;
+
+    const variantsData = root.querySelector('[data-variants-json]');
+    if (!variantsData) return;
+    const variants = JSON.parse(variantsData.textContent);
+    const moneyFormat = root.dataset.moneyFormat || '${{amount}}';
+    const currency = root.dataset.currency || 'USD';
+
+    const variantInput = root.querySelector('[data-variant-input]');
+    const priceEl = root.querySelector('[data-product-price]');
+    const compareEl = root.querySelector('[data-product-compare]');
+    const saveEl = root.querySelector('[data-product-save]');
+    const addButton = root.querySelector('[data-add-to-cart]');
+    const optionGroups = root.querySelectorAll('[data-option-index]');
+    const mainImage = root.querySelector('[data-product-main-image]');
+    const thumbButtons = root.querySelectorAll('[data-product-thumb]');
+    const qtyInput = root.querySelector('[data-qty-input]');
+    const qtyMinus = root.querySelector('[data-qty-minus]');
+    const qtyPlus = root.querySelector('[data-qty-plus]');
+
+    const formatMoney = (cents) => {
+      if (window.Shopify && typeof window.Shopify.formatMoney === 'function') {
+        return window.Shopify.formatMoney(cents, moneyFormat);
+      }
+      return new Intl.NumberFormat(undefined, {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 2,
+      }).format(cents / 100);
+    };
+
+    const updatePrice = (variant) => {
+      if (!variant) return;
+      if (priceEl) priceEl.textContent = formatMoney(variant.price);
+
+      if (compareEl && saveEl && variant.compare_at_price && variant.compare_at_price > variant.price) {
+        compareEl.textContent = formatMoney(variant.compare_at_price);
+        compareEl.hidden = false;
+        const pct = Math.round(((variant.compare_at_price - variant.price) / variant.compare_at_price) * 100);
+        saveEl.textContent = `Save ${pct}%`;
+        saveEl.hidden = false;
+      } else if (compareEl && saveEl) {
+        compareEl.hidden = true;
+        saveEl.hidden = true;
+      }
+    };
+
+    const updateButton = (variant) => {
+      if (!addButton) return;
+      const addText = addButton.dataset.addText || addButton.textContent;
+      const soldText = addButton.dataset.soldoutText || 'Sold out';
+      if (variant && variant.available) {
+        addButton.disabled = false;
+        addButton.textContent = addText;
+      } else {
+        addButton.disabled = true;
+        addButton.textContent = soldText;
+      }
+    };
+
+    const findVariant = () => {
+      const selected = Array.from(optionGroups).map((group) => {
+        const checked = group.querySelector('input:checked');
+        return checked ? checked.value : null;
+      });
+
+      return variants.find((variant) => variant.options.every((option, index) => option === selected[index]));
+    };
+
+    const updateVariant = () => {
+      const variant = findVariant();
+      if (!variant) return;
+      if (variantInput) variantInput.value = variant.id;
+      updatePrice(variant);
+      updateButton(variant);
+
+      if (variant.featured_image && variant.featured_image.src && mainImage) {
+        mainImage.src = variant.featured_image.src;
+      }
+    };
+
+    optionGroups.forEach((group) => {
+      group.addEventListener('change', updateVariant);
+    });
+
+    thumbButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const src = button.dataset.imageSrc;
+        if (src && mainImage) {
+          mainImage.src = src;
+        }
+        thumbButtons.forEach((btn) => btn.classList.remove('is-active'));
+        thumbButtons.forEach((btn) => btn.setAttribute('aria-pressed', 'false'));
+        button.classList.add('is-active');
+        button.setAttribute('aria-pressed', 'true');
+      });
+    });
+
+    if (qtyMinus && qtyPlus && qtyInput) {
+      qtyMinus.addEventListener('click', () => {
+        const next = Math.max(1, Number(qtyInput.value || 1) - 1);
+        qtyInput.value = next;
+      });
+      qtyPlus.addEventListener('click', () => {
+        const next = Math.max(1, Number(qtyInput.value || 1) + 1);
+        qtyInput.value = next;
+      });
+    }
+
+    updateVariant();
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Battle Product Page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show Team Badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "Team Sweet Item"
+    },
+    {
+      "type": "color",
+      "id": "team_color",
+      "label": "Team Color",
+      "default": "#db2777"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_battle_box",
+      "label": "Show Battle Impact",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "battle_title",
+      "label": "Battle Box Title",
+      "default": "Boost Team Sweet!"
+    },
+    {
+      "type": "text",
+      "id": "battle_desc",
+      "label": "Battle Box Description",
+      "default": "Purchasing this item adds points to the live battle score."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "Add to cart and vote sweet"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Button Color",
+      "default": "#db2777"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle Product Page"
+    }
+  ]
+}
+{% endschema %}

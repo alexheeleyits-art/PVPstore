@@ -1,0 +1,50 @@
+<section class="py-20 bg-white" data-section-id="{{ section.id }}">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">{{ section.settings.title }}</h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">{{ section.settings.subtitle }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+      <!-- Connecting line for desktop -->
+      <div class="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gray-100 -z-10"></div>
+
+      {% for block in section.blocks %}
+        <div class="flex flex-col items-center text-center">
+          <div class="w-24 h-24 bg-white border-2 {% if forloop.index == 2 %}border-pink-100{% elsif forloop.index == 3 %}border-yellow-100{% else %}border-gray-100{% endif %} rounded-full flex items-center justify-center text-3xl font-black {% if forloop.index == 2 %}text-pink-300{% elsif forloop.index == 3 %}text-yellow-300{% else %}text-gray-300{% endif %} shadow-sm mb-6 relative">
+            {{ forloop.index }}
+            <div class="absolute inset-0 border-b-4 {% if forloop.index == 2 %}border-pink-200{% elsif forloop.index == 3 %}border-yellow-200{% else %}border-gray-200{% endif %} rounded-full"></div>
+          </div>
+          <h3 class="text-xl font-bold mb-3">{{ block.settings.title }}</h3>
+          <p class="text-gray-500 leading-relaxed">{{ block.settings.description }}</p>
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "How It Works",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "HOW THE BATTLE WORKS" },
+    { "type": "textarea", "id": "subtitle", "label": "Subtitle", "default": "Join a team..." }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Step Title" },
+        { "type": "textarea", "id": "description", "label": "Step Description" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "How It Works"
+    }
+  ]
+}
+{% endschema %}

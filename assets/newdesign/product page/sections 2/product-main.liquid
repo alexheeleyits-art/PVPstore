@@ -1,0 +1,242 @@
+<section class="bg-white py-12 border-b border-gray-100" data-section-id="{{ section.id }}">
+  <div class="max-w-7xl mx-auto px-4">
+    
+    <!-- Breadcrumb -->
+    <div class="mb-6 flex items-center gap-2 text-sm text-gray-500">
+      <a href="/" class="hover:text-black transition-colors text-decoration-none">Home</a>
+      <span>/</span>
+      {% if product.collections.first %}
+      <a href="{{ product.collections.first.url }}" class="hover:text-black transition-colors text-decoration-none">{{ product.collections.first.title }}</a>
+      <span>/</span>
+      {% endif %}
+      <span class="text-black font-medium">{{ product.title }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+      
+      <!-- Gallery -->
+      <div class="space-y-4">
+        <div class="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden group">
+           {% if product.featured_image %}
+             <img 
+                id="main-product-image-{{ section.id }}"
+                src="{{ product.featured_image | image_url: width: 1000 }}" 
+                alt="{{ product.title }}" 
+                class="w-full h-full object-cover transition-opacity duration-300"
+             >
+           {% else %}
+             {{ 'product-1' | placeholder_svg_tag: 'w-full h-full object-cover' }}
+           {% endif %}
+           
+           {% if section.settings.show_badge %}
+           <div class="absolute top-4 left-4 text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg z-10" 
+                style="background-color: {{ section.settings.team_color }};">
+             {{ section.settings.badge_text }}
+           </div>
+           {% endif %}
+        </div>
+
+        <div class="flex gap-4 overflow-x-auto pb-2">
+          {% for media in product.media %}
+            <button 
+              onclick="changeImage('{{ media | image_url: width: 1000 }}', this)"
+              class="gallery-thumb relative w-24 aspect-square rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all {% if forloop.first %}border-pink-600 opacity-100{% else %}border-transparent opacity-70 hover:opacity-100{% endif %}"
+            >
+              <img src="{{ media | image_url: width: 200 }}" alt="{{ media.alt }}" class="w-full h-full object-cover">
+            </button>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="flex flex-col">
+        
+        <!-- Header -->
+        <div class="mb-6">
+          <div class="flex items-center gap-2 text-yellow-400 mb-3">
+            <div class="flex">
+              {% render 'icon-stars-5' %}
+            </div>
+            <span class="text-gray-500 text-sm font-medium">({{ product.reviews_count | default: 128 }} Reviews)</span>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
+            {{ product.title }}
+          </h1>
+          <div class="flex items-baseline gap-4 mb-4">
+            <span class="text-3xl font-bold text-gray-900">{{ product.price | money }}</span>
+            {% if product.compare_at_price > product.price %}
+            <span class="text-xl text-gray-400 line-through">{{ product.compare_at_price | money }}</span>
+            <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded">SAVE 18%</span>
+            {% endif %}
+          </div>
+          <div class="text-gray-600 leading-relaxed rte">
+            {{ product.description }}
+          </div>
+        </div>
+
+        <!-- Battle Impact Box -->
+        {% if section.settings.show_battle_box %}
+        <div class="bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-100 rounded-xl p-5 mb-8">
+           <div class="flex items-start gap-4">
+             <div class="bg-white p-2 rounded-lg shadow-sm text-pink-600">
+               {% render 'icon-star' %}
+             </div>
+             <div>
+               <h4 class="font-bold text-gray-900 mb-1">{{ section.settings.battle_title }}</h4>
+               <p class="text-sm text-gray-600 mb-2">{{ section.settings.battle_desc }}</p>
+               <div class="w-full h-2 bg-pink-200 rounded-full overflow-hidden">
+                 <div class="h-full w-[75%] bg-pink-500 rounded-full animate-pulse"></div>
+               </div>
+               <p class="text-xs text-pink-600 font-bold mt-1 text-right">Team Impact: High</p>
+             </div>
+           </div>
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        {% form 'product', product %}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+          <div class="mb-8 space-y-4">
+             {% unless product.has_only_default_variant %}
+               {% for option in product.options_with_values %}
+                 <div>
+                   <span class="block text-sm font-bold text-gray-900 mb-2">{{ option.name }}</span>
+                   <div class="flex gap-3">
+                     {% for value in option.values %}
+                       <label class="cursor-pointer">
+                         <input type="radio" name="option-{{ option.position }}" value="{{ value }}" class="sr-only peer" {% if forloop.first %}checked{% endif %}>
+                         <div class="px-4 py-2 rounded-lg border font-medium text-sm transition-all peer-checked:bg-black peer-checked:text-white peer-checked:border-black border-gray-200 hover:border-gray-400">
+                           {{ value }}
+                         </div>
+                       </label>
+                     {% endfor %}
+                   </div>
+                 </div>
+               {% endfor %}
+             {% endunless %}
+
+             <div>
+                <span class="block text-sm font-bold text-gray-900 mb-2">Quantity</span>
+                <div class="inline-flex items-center border border-gray-300 rounded-lg">
+                  <button type="button" onclick="updateQty(-1)" class="p-3 hover:bg-gray-50 text-gray-600">{% render 'icon-minus' %}</button>
+                  <input type="number" name="quantity" id="qty-{{ section.id }}" value="1" class="w-12 text-center font-bold border-none p-0 focus:ring-0" min="1">
+                  <button type="button" onclick="updateQty(1)" class="p-3 hover:bg-gray-50 text-gray-600">{% render 'icon-plus' %}</button>
+                </div>
+             </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-col gap-3 mb-8">
+            <button type="submit" class="w-full bg-pink-600 text-white py-4 rounded-xl font-black text-lg shadow-xl shadow-pink-200 hover:bg-pink-700 hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-center gap-2" style="background-color: {{ section.settings.btn_color }}; box-shadow: 0 20px 25px -5px {{ section.settings.btn_color | color_modify: 'alpha', 0.2 }};">
+              {{ section.settings.btn_text }}
+            </button>
+            <div class="flex items-center justify-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest mt-2">
+              {% render 'icon-clock' %} Selling Fast: 42 sold in last hour
+            </div>
+          </div>
+        {% endform %}
+
+        <!-- Trust Badges -->
+        <div class="grid grid-cols-2 gap-4 border-t border-gray-100 pt-6">
+           <div class="flex items-center gap-3">
+             {% render 'icon-shield' %}
+             <span class="text-sm text-gray-600">Authentic Ingredients</span>
+           </div>
+           <div class="flex items-center gap-3">
+             {% render 'icon-truck' %}
+             <span class="text-sm text-gray-600">Fast Shipping</span>
+           </div>
+           <div class="flex items-center gap-3">
+             {% render 'icon-check' %}
+             <span class="text-sm text-gray-600">Quality Guarantee</span>
+           </div>
+           <div class="flex items-center gap-3">
+             {% render 'icon-star' %}
+             <span class="text-sm text-gray-600">Award Winning</span>
+           </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function changeImage(src, btn) {
+    document.getElementById('main-product-image-{{ section.id }}').src = src;
+    document.querySelectorAll('.gallery-thumb').forEach(el => {
+       el.classList.remove('border-pink-600', 'opacity-100');
+       el.classList.add('border-transparent', 'opacity-70');
+    });
+    btn.classList.remove('border-transparent', 'opacity-70');
+    btn.classList.add('border-pink-600', 'opacity-100');
+  }
+
+  function updateQty(change) {
+    const input = document.getElementById('qty-{{ section.id }}');
+    const newVal = parseInt(input.value) + change;
+    if(newVal >= 1) input.value = newVal;
+  }
+</script>
+
+{% schema %}
+{
+  "name": "Battle Product Page",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show Team Badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "Team Sweet Item"
+    },
+    {
+      "type": "color",
+      "id": "team_color",
+      "label": "Team Color",
+      "default": "#db2777"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_battle_box",
+      "label": "Show Battle Impact",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "battle_title",
+      "label": "Battle Box Title",
+      "default": "Boost Team Sweet!"
+    },
+    {
+      "type": "text",
+      "id": "battle_desc",
+      "label": "Battle Box Description",
+      "default": "Purchasing this item adds +15 Points to the live battle score."
+    },
+    {
+      "type": "text",
+      "id": "btn_text",
+      "label": "Button Text",
+      "default": "ADD TO CART & VOTE SWEET"
+    },
+    {
+      "type": "color",
+      "id": "btn_color",
+      "label": "Button Color",
+      "default": "#db2777"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Battle Product Page"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,75 @@
+<div class="bg-black text-white w-full py-2 overflow-hidden" data-section-id="{{ section.id }}">
+  <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-4 text-xs md:text-sm">
+    
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+        </span>
+        <span class="font-bold tracking-wider">{{ section.settings.live_text | default: 'LIVE STATUS' }}</span>
+      </div>
+
+      <div class="flex items-center gap-2 text-gray-300">
+        {% render 'icon-users' %}
+        <span class="tabular-nums font-bold text-white" id="live-shoppers-{{ section.id }}">247</span> active shoppers
+      </div>
+
+      <div class="hidden sm:flex items-center gap-2 text-gray-300">
+        {% render 'icon-shopping-bag' %}
+        <span class="tabular-nums font-bold text-white" id="items-sold-{{ section.id }}">1,247+</span> items sold
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black px-3 py-1 rounded-full font-bold shadow-[0_0_15px_rgba(234,179,8,0.5)]">
+      {% render 'icon-trophy' %}
+      {{ section.settings.promo_text | default: 'WINNER GETS 20% OFF' }}
+    </div>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const shoppersEl = document.getElementById('live-shoppers-{{ section.id }}');
+    const itemsEl = document.getElementById('items-sold-{{ section.id }}');
+    
+    let shoppers = 247;
+    let items = 1247;
+
+    setInterval(() => {
+      shoppers = Math.max(200, shoppers + Math.floor(Math.random() * 5) - 2);
+      if (shoppersEl) shoppersEl.innerText = shoppers;
+      
+      if (Math.random() > 0.7) {
+        items++;
+        if (itemsEl) itemsEl.innerText = items + '+';
+      }
+    }, 1500);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Live Status Bar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "live_text",
+      "label": "Live Indicator Text",
+      "default": "LIVE STATUS"
+    },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "Promo Badge Text",
+      "default": "WINNER GETS 20% OFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Live Status Bar"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,91 @@
+<div class="bg-white py-6 border-b border-gray-100" data-section-id="{{ section.id }}">
+  <div class="max-w-7xl mx-auto px-4">
+    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">{{ section.settings.title }}</h3>
+    
+    <div class="flex flex-col md:flex-row gap-4" id="live-feed-container-{{ section.id }}">
+       <!-- JS will inject items here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('live-feed-container-{{ section.id }}');
+    const sweetItems = {{ section.settings.sweet_items | split: ',' | json }};
+    const savouryItems = {{ section.settings.savoury_items | split: ',' | json }};
+    const names = ["Alex", "Sarah", "Mike", "Jessica", "David", "Emma", "Tom", "Lisa"];
+    
+    function createItem() {
+       const isSweet = Math.random() > 0.45;
+       const item = isSweet 
+          ? sweetItems[Math.floor(Math.random() * sweetItems.length)] 
+          : savouryItems[Math.floor(Math.random() * savouryItems.length)];
+       const name = names[Math.floor(Math.random() * names.length)];
+       const teamColor = isSweet ? 'border-pink-500' : 'border-amber-500';
+       const iconColor = isSweet ? 'bg-pink-100 text-pink-600' : 'bg-amber-100 text-amber-600';
+       const textColor = isSweet ? 'text-pink-600' : 'text-amber-600';
+
+       const div = document.createElement('div');
+       div.className = `flex-1 flex items-center gap-3 p-3 rounded-lg border-l-4 shadow-sm bg-gray-50 ${teamColor} opacity-0 translate-y-4 transition-all duration-500`;
+       div.innerHTML = `
+         <div class="p-2 rounded-full ${iconColor}">
+           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+         </div>
+         <div>
+           <p class="text-sm font-bold text-gray-800">
+             ${name} bought <span class="${textColor}">${item}</span>
+           </p>
+           <p class="text-xs text-gray-500">Just now</p>
+         </div>
+       `;
+       
+       if (container.children.length >= 3) {
+         container.removeChild(container.lastElementChild);
+       }
+       container.prepend(div);
+       
+       // Trigger animation
+       requestAnimationFrame(() => {
+         div.classList.remove('opacity-0', 'translate-y-4');
+       });
+    }
+
+    // Initial fill
+    createItem();
+    createItem();
+    createItem();
+
+    setInterval(createItem, 4000);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Live Purchase Feed",
+  "settings": [
+    {
+       "type": "text",
+       "id": "title",
+       "label": "Title",
+       "default": "Live Purchase Feed"
+    },
+    {
+       "type": "textarea",
+       "id": "sweet_items",
+       "label": "Sweet Items (Comma Separated)",
+       "default": "Dark Choco Box,Macaron Set,Strawberry Tart"
+    },
+    {
+       "type": "textarea",
+       "id": "savoury_items",
+       "label": "Savoury Items (Comma Separated)",
+       "default": "Spicy Chips,Cheese Puffs,Pretzel Mix"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Live Purchase Feed"
+    }
+  ]
+}
+{% endschema %}
